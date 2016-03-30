@@ -24,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.6.0"
+version = "v0.6.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -62,7 +62,7 @@ if os.path.isfile('hist.json'):
 # user welcome messages
 welcomes = {'test': 'test'}
 if os.path.isfile('welcomes.json'):
-    with open('hist.json', 'r') as fp:
+    with open('welcomes.json', 'r') as fp:
         welcomes = json.load(fp)
 
 # this instance of a Discord client
@@ -115,11 +115,6 @@ def on_message(message):
 
     # do not parse own messages
     if message.author != client.user:
-
-        # log each message against users
-        history[message.author.name] = (message.content, time.time())
-        with open('hist.json', 'w') as fp:
-            json.dump(history, fp)
 
         # parse messages for commands
         if message.content.startswith('.bots'):
@@ -183,6 +178,11 @@ def on_message(message):
             # save count
             with open('bentrack.json', 'w') as fp:
                 json.dump(bentrack, fp)
+
+        # log each message against users
+        history[message.author.name] = (message.content, time.time())
+        with open('hist.json', 'w') as fp:
+            json.dump(history, fp)
 
 # Run the client
 client.run(email, pwd)
