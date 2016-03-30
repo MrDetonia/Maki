@@ -8,8 +8,10 @@
 # IMPORTS
 import discord
 import asyncio
+import os
 import time
 import datetime
+import json
 from collections import namedtuple
 
 # file in this directory called "secret.py" should contain these variables
@@ -22,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.4.1"
+version = "v0.5.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -43,11 +45,16 @@ admins = ['116883900688629761']
 # GLOBALS
 
 # number of times Ben has mentioned his meme boards
-ben_ck_count = 0
-ben_fit_count = 0
+bentrack = {'ck':0, 'fit':0}
+if os.path.isfile('bentrack.json'):
+    with open('bentrack.json', 'r') as fp:
+        bentrack = json.load(fp)
 
 # log of users' last messages and timestamps
 history = {'test': ('test message',time.time())}
+if os.path.isfile('hist.json'):
+    with open('hist.json', 'r') as fp:
+        history = json.load(fp)
 
 # this instance of a Discord client
 client = discord.Client()
@@ -90,6 +97,8 @@ def on_message(message):
 
         # log each message against users
         history[message.author.name] = (message.content, time.time())
+        with open('hist.json', 'w') as fp:
+            json.dump(history, fp)
 
         # parse messages for commands
         if message.content.startswith('.bots'):
@@ -107,8 +116,9 @@ def on_message(message):
         elif message.content.startswith('.die') and message.author.id in admins:
             # exit discord and kill bot
             yield from client.send_message(message.channel, 'y tho :(')
+
+            # logout of Discord and exit
             yield from client.logout()
-            print('exited via die command')
 
         elif message.content.startswith('.whoami'):
             # show info about user
@@ -126,11 +136,18 @@ def on_message(message):
 
         # Ben meme trackers
         elif '/ck/' in message.content and message.author.name == "Ben.H":
-            ben_ck_count += 1
-            yield from client.send_message(message.channel, 'I have seen Ben reference /ck/ ' + ben_ck_count + ' times now.')
+            bentrack['ck'] += 1
+            yield from client.send_message(message.channel, 'I have seen Ben reference /ck/ ' + bentrack['ck'] + ' times now.')
+            # save count
+            with open('bentrack.json', 'w') as fp:
+                json.dump(bentrack, fp)
+
         elif '/fit/' in message.content and message.author.name == "Ben.H":
-            ben_ck_count += 1
-            yield from client.send_message(message.channel, 'I have seen Ben reference /fit/ ' + ben_fit_count + ' times now.')
+            bentrack['fit'] += 1
+            yield from client.send_message(message.channel, 'I have seen Ben reference /fit/ ' + bentrack['fit'] + ' times now.')
+            # save count
+            with open('bentrack.json', 'w') as fp:
+                json.dump(bentrack, fp)
 
 # Run the client
 client.run(email, pwd)

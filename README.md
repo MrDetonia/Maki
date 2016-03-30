@@ -7,7 +7,9 @@
 Maki uses Python 3.4 with discord.py. Install python3.4 and use pip to install asyncio and discord.py.  
 To run Maki, simply run bot.py.
 
-You will require an account for Maki to use, the logon details for which should be stored in a file called secret.py
+## Required Files
+- You will require an account for Maki to use, the logon details for which should be stored in a file called secret.py
+- Maki uses JSON files to store data persistently. You do not need to create these files, Maki will make them for you.
 
 ## License
 Copyright 2016, Zac Herd.
