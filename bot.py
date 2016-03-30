@@ -24,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.5.0"
+version = "v0.6.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -35,12 +35,15 @@ My commands are:
 .bots - prints basic info
 .source - show a link to my source
 .whoami - displays your user info
+.welcome <message> - set your welcome message
 .seen <user> - prints when user was last seen
 ```"""
 
 # IDs of admin users
 admins = ['116883900688629761']
 
+# default posting channel
+def_chan = '116884620032606215'
 
 # GLOBALS
 
@@ -55,6 +58,12 @@ history = {'test': ('test message',time.time())}
 if os.path.isfile('hist.json'):
     with open('hist.json', 'r') as fp:
         history = json.load(fp)
+
+# user welcome messages
+welcomes = {'test': 'test'}
+if os.path.isfile('welcomes.json'):
+    with open('hist.json', 'r') as fp:
+        welcomes = json.load(fp)
 
 # this instance of a Discord client
 client = discord.Client()
@@ -84,6 +93,18 @@ def on_ready():
     # set "Now Playing" to print version
     game = discord.Game(name = version)
     yield from client.change_status(game, False)
+
+# called when member updates
+@client.event
+@asyncio.coroutine
+def on_member_update(before, after):
+    # display welcome message if user comes online:
+    if before.status == discord.Status.offline and after.status == discord.Status.online:
+        if after.name in welcomes:
+            # print custom welcome
+            yield from client.send_message(client.get_channel(def_chan), welcomes[after.name])
+        else:
+            yield from client.send_message(client.get_channel(def_chan), after.name + ' is now online')
 
 # called when message received
 @client.event
@@ -115,7 +136,7 @@ def on_message(message):
 
         elif message.content.startswith('.die') and message.author.id in admins:
             # exit discord and kill bot
-            yield from client.send_message(message.channel, 'y tho :(')
+            yield from client.send_message(message.channel, 'But will I dream? ;_;')
 
             # logout of Discord and exit
             yield from client.logout()
@@ -123,6 +144,20 @@ def on_message(message):
         elif message.content.startswith('.whoami'):
             # show info about user
             yield from client.send_message(message.channel, 'User: ' + message.author.name + ' ID: ' + message.author.id + ' Discriminator: ' + message.author.discriminator + '\nAccount Created: ' + strfromdt(message.author.created_at))
+
+        elif message.content.startswith('.welcome'):
+            # manage welcome messages
+            if message.author.id in admins:
+                tmp = message.content[9:].split(' ',1)
+                welcomes[tmp[0]] = tmp[1]
+                yield from client.send_message(message.channel, 'Okay, I will now greet ' + tmp[0] + ' with "' + tmp[1] + '"')
+            else:
+                welcomes[message.author.name] = message.content[9:]
+                yield from client.send_message(message.channel, 'Okay, I will now greet ' + message.author.name + ' with "' + message.content[9:] + '"')
+
+            # save welcomes
+            with open('welcomes.json', 'w') as fp:
+                json.dump(welcomes, fp)
 
         elif message.content.startswith('.seen'):
             # print when user was last seen
