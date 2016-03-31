@@ -24,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.6.1"
+version = "v0.6.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -160,6 +160,9 @@ def on_message(message):
             if target in history:
                 # user logged, print last message and time
                 yield from client.send_message(message.channel, 'user ' + target + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1])))
+            elif target == 'Maki':
+                # Maki doesn't need to be .seen
+                yield from client.send_message(message.channel, 'I\'m right here!')
             else:
                 # user not logged
                 yield from client.send_message(message.channel, 'user not seen yet')
