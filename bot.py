@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.7.0"
+version = "v0.7.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -129,12 +129,14 @@ def on_message(message):
             # link to source code
             yield from client.send_message(message.channel, 'These are my insides: <http://27b-a.xyz/mrdetonia/Maki>')
 
-        elif message.content.startswith('.die') and message.author.id in admins:
-            # exit discord and kill bot
-            yield from client.send_message(message.channel, 'But will I dream? ;_;')
-
-            # logout of Discord and exit
-            yield from client.logout()
+        elif message.content.startswith('.die'):
+            if message.author.id in admins:
+                # exit discord and kill bot
+                yield from client.send_message(message.channel, 'But will I dream? ;_;')
+                yield from client.logout()
+            else:
+                # user not admin, refuse
+                yield from client.send_message(message.channel, 'Don\'t be so rude! >:(')
 
         elif message.content.startswith('.whoami'):
             # show info about user
