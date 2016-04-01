@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.9.1"
+version = "v0.9.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -157,11 +157,13 @@ def on_message(message):
     if message.author != client.user:
 
         # send any messages we have for author:
-        if message.author.name in tells and len(tells[message.author.name]) > 0:
+        if message.author.name in tells:
             yield from client.send_message(message.channel, 'Hey ' + message.author.name + ', I have messages for you!')
             for msg in tells[message.author.name]:
                 yield from client.send_message(message.author, msg[0] + ' says "' + msg[1] + '"')
-                tells[message.author.name].remove(msg)
+
+            # delete this user's entry
+            del tells[message.author.name]
 
             # update messages
             with open('tells.json', 'w') as fp:
