@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.9.0"
+version = "v0.9.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -31,7 +31,8 @@ helptext = """I am a bot written in Python by MrDetonia
 My commands are:
 ```
 .help - displays this text
-.bots - prints basic info
+.bots - prints bot info
+.version - prints bot info
 .upskirt - show a link to my source
 .whoami - displays your user info
 .whois <user> - displays another user's info
@@ -167,9 +168,9 @@ def on_message(message):
                 json.dump(tells, fp)
 
         # parse messages for commands
-        if message.content.startswith('.bots'):
+        if message.content.startswith('.bots') or message.content.startswith('.version'):
             # print bot info
-            yield from client.send_message(message.channel, 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python 3.4 with discord.py')
+            yield from client.send_message(message.channel, 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python 3.4 | discord.py ' + discord.__version__)
 
         elif message.content.startswith('.help'):
             # print command list
