@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.7.4"
+version = "v0.7.5"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -170,6 +170,8 @@ def on_message(message):
                 yield from client.send_message(message.channel, 'user not seen yet')
 
         elif message.content.startswith('.say'):
+            # delete calling message for effect
+            yield from client.delete_message(message)
             # echo message
             yield from client.send_message(message.channel, message.content[5:])
 
