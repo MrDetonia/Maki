@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.7.6"
+version = "v0.8.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -34,6 +34,7 @@ My commands are:
 .bots - prints basic info
 .upskirt - show a link to my source
 .whoami - displays your user info
+.whois <user> - displays another user's info
 .welcome <message> - set your own welcome message
 .seen <user> - prints when user was last seen
 .say <msg> - say something
@@ -54,16 +55,22 @@ if os.path.isfile('bentrack.json'):
         bentrack = json.load(fp)
 
 # log of users' last messages and timestamps
-history = {'test': ('test message',time.time())}
+history = {}
 if os.path.isfile('hist.json'):
     with open('hist.json', 'r') as fp:
         history = json.load(fp)
 
 # user welcome messages
-welcomes = {'test': 'test'}
+welcomes = {}
 if os.path.isfile('welcomes.json'):
     with open('welcomes.json', 'r') as fp:
         welcomes = json.load(fp)
+
+# seen users and IDs
+users = {}
+if os.path.isfile('users.json'):
+    with open('users.json', 'r') as fp:
+        users = json.load(fp)
 
 # this instance of the Discord client
 client = discord.Client()
@@ -106,6 +113,22 @@ def on_member_update(before, after):
         else:
             yield from client.send_message(client.get_channel(def_chan), after.name + ' is now online')
 
+    # track usernames and IDs:
+    if after.name not in users:
+        # store user ID
+        users[after.name] = after.id
+
+        # delete old entry if username changed
+        if after.name != before.name:
+            try:
+                users.pop(before.name, None)
+            except KeyError:
+                pass
+
+        # update JSON file
+        with open('users.json', 'w') as fp:
+            json.dump(users, fp)
+
 # called when message received
 @client.event
 @asyncio.coroutine
@@ -141,6 +164,15 @@ def on_message(message):
         elif message.content.startswith('.whoami'):
             # show info about user
             yield from client.send_message(message.channel, 'User: ' + message.author.name + ' ID: ' + message.author.id + ' Discriminator: ' + message.author.discriminator + '\nAccount Created: ' + strfromdt(message.author.created_at))
+
+        elif message.content.startswith('.whois'):
+            # show info about another user
+            tmp = message.content[7:]
+            if tmp in users:
+                user = message.server.get_member(users[tmp])
+                yield from client.send_message(message.channel, 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at))
+            else:
+                yield from client.send_message(message.channel, 'I haven\'t seen ' + tmp + ' yet! :(')
 
         elif message.content.startswith('.welcome'):
             # manage welcome messages
