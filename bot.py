@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.7.2"
+version = "v0.7.3"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -32,7 +32,7 @@ My commands are:
 ```
 .help - displays this text
 .bots - prints basic info
-.source - show a link to my source
+.upskirt - show a link to my source
 .whoami - displays your user info
 .welcome <message> - set your own welcome message
 .seen <user> - prints when user was last seen
@@ -125,9 +125,9 @@ def on_message(message):
             # print command list
             yield from client.send_message(message.channel, helptext)
 
-        elif message.content.startswith('.source'):
+        elif message.content.startswith('.upskirt'):
             # link to source code
-            yield from client.send_message(message.channel, 'These are my insides: <https://27b-a.xyz:80/mrdetonia/Maki>')
+            yield from client.send_message(message.channel, 'No, don\'t look at my pantsu! Baka! <https://27b-a.xyz:80/mrdetonia/Maki>')
 
         elif message.content.startswith('.die'):
             if message.author.id in admins:
