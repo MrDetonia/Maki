@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.7.1"
+version = "v0.7.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -127,7 +127,7 @@ def on_message(message):
 
         elif message.content.startswith('.source'):
             # link to source code
-            yield from client.send_message(message.channel, 'These are my insides: <http://27b-a.xyz/mrdetonia/Maki>')
+            yield from client.send_message(message.channel, 'These are my insides: <https://27b-a.xyz:80/mrdetonia/Maki>')
 
         elif message.content.startswith('.die'):
             if message.author.id in admins:
