@@ -12,7 +12,6 @@ import os
 import time
 import datetime
 import json
-from collections import namedtuple
 
 # file in this directory called "secret.py" should contain these variables
 from secret import email,pwd
@@ -24,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.6.2"
+version = "v0.7.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -35,8 +34,9 @@ My commands are:
 .bots - prints basic info
 .source - show a link to my source
 .whoami - displays your user info
-.welcome <message> - set your welcome message
+.welcome <message> - set your own welcome message
 .seen <user> - prints when user was last seen
+.say <msg> - say something
 ```"""
 
 # IDs of admin users
@@ -65,7 +65,7 @@ if os.path.isfile('welcomes.json'):
     with open('welcomes.json', 'r') as fp:
         welcomes = json.load(fp)
 
-# this instance of a Discord client
+# this instance of the Discord client
 client = discord.Client()
 
 
@@ -166,6 +166,10 @@ def on_message(message):
             else:
                 # user not logged
                 yield from client.send_message(message.channel, 'user not seen yet')
+
+        elif message.content.startswith('.say'):
+            # echo message
+            yield from client.send_message(message.channel, message.content[5:])
 
         # Ben meme trackers
         elif '/ck/' in message.content and message.author.name == "Ben.H":
