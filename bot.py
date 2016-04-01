@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.8.0"
+version = "v0.8.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -86,6 +86,7 @@ def strfromdt(dt):
 def dtfromts(ts):
     return datetime.datetime.fromtimestamp(ts)
 
+
 # EVENT HANDLERS
 
 # called when client ready
@@ -135,6 +136,14 @@ def on_member_update(before, after):
 def on_message(message):
     # print messages to terminal for info
     print(message.author.name + ': ' + message.content)
+
+    # ensure we store this user's ID
+    if message.author.name not in users:
+        users[message.author.name] = message.author.id
+
+        # update JSON file
+        with open('users.json', 'w') as fp:
+            json.dump(users, fp)
 
     # do not parse own messages
     if message.author != client.user:
