@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.8.1"
+version = "v0.9.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -37,6 +37,7 @@ My commands are:
 .whois <user> - displays another user's info
 .welcome <message> - set your own welcome message
 .seen <user> - prints when user was last seen
+.tell <user> <message> - send message to user when they are next active
 .say <msg> - say something
 ```"""
 
@@ -71,6 +72,12 @@ users = {}
 if os.path.isfile('users.json'):
     with open('users.json', 'r') as fp:
         users = json.load(fp)
+
+# messages left for users
+tells = {}
+if os.path.isfile('tells.json'):
+    with open('tells.json', 'r') as fp:
+        tells = json.load(fp)
 
 # this instance of the Discord client
 client = discord.Client()
@@ -148,6 +155,17 @@ def on_message(message):
     # do not parse own messages
     if message.author != client.user:
 
+        # send any messages we have for author:
+        if message.author.name in tells and len(tells[message.author.name]) > 0:
+            yield from client.send_message(message.channel, 'Hey ' + message.author.name + ', I have messages for you!')
+            for msg in tells[message.author.name]:
+                yield from client.send_message(message.author, msg[0] + ' says "' + msg[1] + '"')
+                tells[message.author.name].remove(msg)
+
+            # update messages
+            with open('tells.json', 'w') as fp:
+                json.dump(tells, fp)
+
         # parse messages for commands
         if message.content.startswith('.bots'):
             # print bot info
@@ -209,6 +227,21 @@ def on_message(message):
             else:
                 # user not logged
                 yield from client.send_message(message.channel, 'user not seen yet')
+
+        elif message.content.startswith('.tell'):
+            # store message to tell user
+            tmp = message.content[6:].split(' ',1)
+            try:
+                tells[tmp[0]].append((message.author.name, tmp[1]))
+            except (NameError, KeyError):
+                tells[tmp[0]] = [(message.author.name, tmp[1])]
+
+            # save messages
+            with open('tells.json', 'w') as fp:
+                json.dump(tells, fp)
+
+            # let user know message is ready
+            yield from client.send_message(message.channel, 'Okay ' + message.author.name + ', I\'ll tell ' + tmp[0] + ' when I next see them!')
 
         elif message.content.startswith('.say'):
             # delete calling message for effect
