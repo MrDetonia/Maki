@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.7.5"
+version = "v0.7.6"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -175,8 +175,14 @@ def on_message(message):
             # echo message
             yield from client.send_message(message.channel, message.content[5:])
 
+        else:
+            # log each message against users
+            history[message.author.name] = (message.content, time.time())
+            with open('hist.json', 'w') as fp:
+                json.dump(history, fp)
+
         # Ben meme trackers
-        elif '/ck/' in message.content and message.author.name == "Ben.H":
+        if '/ck/' in message.content and message.author.name == "Ben.H":
             bentrack['ck'] += 1
             yield from client.send_message(message.channel, 'I have seen Ben reference /ck/ ' + bentrack['ck'] + ' times now.')
             # save count
@@ -190,10 +196,6 @@ def on_message(message):
             with open('bentrack.json', 'w') as fp:
                 json.dump(bentrack, fp)
 
-        # log each message against users
-        history[message.author.name] = (message.content, time.time())
-        with open('hist.json', 'w') as fp:
-            json.dump(history, fp)
 
 # Run the client
 client.run(email, pwd)
