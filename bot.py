@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.9.2"
+version = "v0.9.3"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -153,8 +153,8 @@ def on_message(message):
         with open('users.json', 'w') as fp:
             json.dump(users, fp)
 
-    # do not parse own messages
-    if message.author != client.user:
+    # do not parse own messages or private messages
+    if message.author != client.user and type(message.channel) is not discord.PrivateChannel:
 
         # send any messages we have for author:
         if message.author.name in tells:
