@@ -23,7 +23,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.9.3"
+version = "v0.9.4"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -261,14 +261,14 @@ def on_message(message):
         # Ben meme trackers
         if '/ck/' in message.content and message.author.name == "Ben.H":
             bentrack['ck'] += 1
-            yield from client.send_message(message.channel, 'I have seen Ben reference /ck/ ' + bentrack['ck'] + ' times now.')
+            yield from client.send_message(message.channel, 'I have seen Ben reference /ck/ ' + str(bentrack['ck']) + ' times now.')
             # save count
             with open('bentrack.json', 'w') as fp:
                 json.dump(bentrack, fp)
 
         elif '/fit/' in message.content and message.author.name == "Ben.H":
             bentrack['fit'] += 1
-            yield from client.send_message(message.channel, 'I have seen Ben reference /fit/ ' + bentrack['fit'] + ' times now.')
+            yield from client.send_message(message.channel, 'I have seen Ben reference /fit/ ' + str(bentrack['fit']) + ' times now.')
             # save count
             with open('bentrack.json', 'w') as fp:
                 json.dump(bentrack, fp)
