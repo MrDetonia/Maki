@@ -24,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.2"
+version = "v0.10.3"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -283,8 +283,9 @@ def on_message(message):
                 json.dump(history, fp)
 
             # log user messages for markov chains
-            with open('./markovs/' + message.author.id, 'a') as fp:
-                fp.write('\n' + message.content)
+            if '```' not in message.content:
+                with open('./markovs/' + message.author.id, 'a') as fp:
+                    fp.write('\n' + message.content)
 
         # Ben meme trackers
         if '/ck/' in message.content and message.author.name == "Ben.H":
