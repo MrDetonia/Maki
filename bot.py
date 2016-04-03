@@ -24,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.1"
+version = "v0.10.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -157,12 +157,21 @@ def on_message(message):
 
     # do not parse own messages or private messages
     if message.author != client.user and type(message.channel) is not discord.PrivateChannel:
+        # response to send to channel
+        response = ''
 
         # send any messages we have for author:
         if message.author.name in tells:
-            yield from client.send_message(message.channel, 'Hey ' + message.author.name + ', I have messages for you!')
             for msg in tells[message.author.name]:
-                yield from client.send_message(message.author, msg[0] + ' says "' + msg[1] + '"')
+                for attempt in range(5):
+                    try:
+                        yield from client.send_message(message.author, msg[0] + ' says "' + msg[1] + '"')
+                    except HTTPException:
+                        continue
+                    else:
+                        break
+                else:
+                    print('ERROR: Failed to send private message after 5 attempts')
 
             # delete this user's entry
             del tells[message.author.name]
@@ -174,15 +183,15 @@ def on_message(message):
         # parse messages for commands
         if message.content.startswith('.bots') or message.content.startswith('.version'):
             # print bot info
-            yield from client.send_message(message.channel, 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python 3.4 | discord.py ' + discord.__version__)
+            response = 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python 3.4 | discord.py ' + discord.__version__
 
         elif message.content.startswith('.help'):
             # print command list
-            yield from client.send_message(message.channel, helptext)
+            response = helptext
 
         elif message.content.startswith('.upskirt'):
             # link to source code
-            yield from client.send_message(message.channel, 'No, don\'t look at my pantsu! Baka! <https://27b-a.xyz:55555/mrdetonia/Maki>')
+            response = 'No, don\'t look at my pantsu! Baka! <https://27b-a.xyz:55555/mrdetonia/Maki>'
 
         elif message.content.startswith('.die'):
             if message.author.id in admins:
@@ -191,30 +200,30 @@ def on_message(message):
                 yield from client.logout()
             else:
                 # user not admin, refuse
-                yield from client.send_message(message.channel, 'Don\'t be so rude! >:(')
+                response = 'Don\'t be so rude! >:('
 
         elif message.content.startswith('.whoami'):
             # show info about user
-            yield from client.send_message(message.channel, 'User: ' + message.author.name + ' ID: ' + message.author.id + ' Discriminator: ' + message.author.discriminator + '\nAccount Created: ' + strfromdt(message.author.created_at))
+            response = 'User: ' + message.author.name + ' ID: ' + message.author.id + ' Discriminator: ' + message.author.discriminator + '\nAccount Created: ' + strfromdt(message.author.created_at)
 
         elif message.content.startswith('.whois'):
             # show info about another user
             tmp = message.content[7:]
             if tmp in users:
                 user = message.server.get_member(users[tmp])
-                yield from client.send_message(message.channel, 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at))
+                response = 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at)
             else:
-                yield from client.send_message(message.channel, 'I haven\'t seen ' + tmp + ' yet! :(')
+                response = 'I haven\'t seen ' + tmp + ' yet! :('
 
         elif message.content.startswith('.welcome'):
             # manage welcome messages
             if message.author.id in admins:
                 tmp = message.content[9:].split(' ',1)
                 welcomes[tmp[0]] = tmp[1]
-                yield from client.send_message(message.channel, 'Okay, I will now greet ' + tmp[0] + ' with "' + tmp[1] + '"')
+                response = 'Okay, I will now greet ' + tmp[0] + ' with "' + tmp[1] + '"'
             else:
                 welcomes[message.author.name] = message.content[9:]
-                yield from client.send_message(message.channel, 'Okay, I will now greet ' + message.author.name + ' with "' + message.content[9:] + '"')
+                response = 'Okay, I will now greet ' + message.author.name + ' with "' + message.content[9:] + '"'
 
             # save welcomes
             with open('welcomes.json', 'w') as fp:
@@ -225,13 +234,13 @@ def on_message(message):
             target = message.content[6:]
             if target in history:
                 # user logged, print last message and time
-                yield from client.send_message(message.channel, 'user ' + target + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1])))
+                response = 'user ' + target + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1]))
             elif target == 'Maki':
                 # Maki doesn't need to be .seen
-                yield from client.send_message(message.channel, 'I\'m right here!')
+                response = 'I\'m right here!'
             else:
                 # user not logged
-                yield from client.send_message(message.channel, 'user not seen yet')
+                response = 'user not seen yet'
 
         elif message.content.startswith('.tell'):
             # store message to tell user
@@ -246,13 +255,13 @@ def on_message(message):
                 json.dump(tells, fp)
 
             # let user know message is ready
-            yield from client.send_message(message.channel, 'Okay ' + message.author.name + ', I\'ll tell ' + tmp[0] + ' when I next see them!')
+            response = 'Okay ' + message.author.name + ', I\'ll tell ' + tmp[0] + ' when I next see them!'
 
         elif message.content.startswith('.say'):
             # delete calling message for effect
             yield from client.delete_message(message)
             # echo message
-            yield from client.send_message(message.channel, message.content[5:])
+            response = message.content[5:]
 
         elif message.content.startswith('.markov'):
             # generate a markov chain sentence based on the user's chat history
@@ -260,11 +269,11 @@ def on_message(message):
             if os.path.isfile('./markovs/' + users[tmp]):
                 mc = markov.Markov(open('./markovs/' + users[tmp]))
                 try:
-                    yield from client.send_message(message.channel, mc.generate_text())
+                    response = mc.generate_text()
                 except KeyError:
-                    yield from client.send_message(message.channel, 'Something went wrong :( Maybe you haven\'t spoken enough yet?')
+                    response = 'Something went wrong :( Maybe you haven\'t spoken enough yet?'
             else:
-                yield from client.send_message(message.channel, 'I haven\'t seen that user speak yet!')
+                response = 'I haven\'t seen that user speak yet!'
 
         # Stuff that happens when message is not a bot command:
         else:
@@ -280,17 +289,29 @@ def on_message(message):
         # Ben meme trackers
         if '/ck/' in message.content and message.author.name == "Ben.H":
             bentrack['ck'] += 1
-            yield from client.send_message(message.channel, 'I have seen Ben reference /ck/ ' + str(bentrack['ck']) + ' times now.')
+            response = 'I have seen Ben reference /ck/ ' + str(bentrack['ck']) + ' times now.'
             # save count
             with open('bentrack.json', 'w') as fp:
                 json.dump(bentrack, fp)
 
         elif '/fit/' in message.content and message.author.name == "Ben.H":
             bentrack['fit'] += 1
-            yield from client.send_message(message.channel, 'I have seen Ben reference /fit/ ' + str(bentrack['fit']) + ' times now.')
+            response = 'I have seen Ben reference /fit/ ' + str(bentrack['fit']) + ' times now.'
             # save count
             with open('bentrack.json', 'w') as fp:
                 json.dump(bentrack, fp)
+
+        # send response to channel if needed:
+        if response is not '':
+            for attempt in range(5):
+                try:
+                    yield from client.send_message(message.channel, response)
+                except HTTPException:
+                    continue
+                else:
+                    break
+            else:
+                print('ERROR: Failed to send message to discord after 5 attempts')
 
 
 # Run the client
