@@ -166,7 +166,7 @@ def on_message(message):
                 for attempt in range(5):
                     try:
                         yield from client.send_message(message.author, msg[0] + ' says "' + msg[1] + '"')
-                    except HTTPException:
+                    except discord.errors.HTTPException:
                         continue
                     else:
                         break
@@ -306,7 +306,7 @@ def on_message(message):
             for attempt in range(5):
                 try:
                     yield from client.send_message(message.channel, response)
-                except HTTPException:
+                except discord.errors.HTTPException:
                     continue
                 else:
                     break
