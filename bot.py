@@ -11,6 +11,7 @@ import asyncio
 import os
 import time
 import datetime
+import random
 import json
 import markov
 
@@ -24,7 +25,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.3"
+version = "v0.10.4"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -269,7 +270,7 @@ def on_message(message):
             if os.path.isfile('./markovs/' + users[tmp]):
                 mc = markov.Markov(open('./markovs/' + users[tmp]))
                 try:
-                    response = mc.generate_text()
+                    response = mc.generate_text(random.randint(20,40))
                 except KeyError:
                     response = 'Something went wrong :( Maybe you haven\'t spoken enough yet?'
             else:
