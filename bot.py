@@ -12,6 +12,7 @@ import os
 import time
 import datetime
 import json
+import markov
 
 # file in this directory called "secret.py" should contain these variables
 from secret import email,pwd
@@ -23,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.9.4"
+version = "v0.10.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -40,6 +41,7 @@ My commands are:
 .seen <user> - prints when user was last seen
 .tell <user> <message> - send message to user when they are next active
 .say <msg> - say something
+.markov <user> - generate sentence using markov chains over a user's chat history
 ```"""
 
 # IDs of admin users
@@ -144,6 +146,8 @@ def on_member_update(before, after):
 def on_message(message):
     # print messages to terminal for info
     print(message.author.name + ': ' + message.content)
+
+
 
     # ensure we store this user's ID
     if message.author.name not in users:
@@ -252,11 +256,25 @@ def on_message(message):
             # echo message
             yield from client.send_message(message.channel, message.content[5:])
 
+        elif message.content.startswith('.markov'):
+            # generate a markov chain sentence based on the user's chat history
+            tmp = message.content[8:].split(' ',1)
+            if os.path.isfile('./markovs/' + users[tmp[0]]):
+                mc = markov.Markov(open('./markovs/' + users[tmp[0]]))
+                yield from client.send_message(message.channel, mc.generate_text())
+            else:
+                yield from client.send_message(message.channel, 'I haven\'t seen that user speak yet!')
+
+        # Stuff that happens when message is not a bot command:
         else:
             # log each message against users
             history[message.author.name] = (message.content, time.time())
             with open('hist.json', 'w') as fp:
                 json.dump(history, fp)
+
+            # log user messages for markov chains
+            with open('./markovs/' + message.author.id, 'a') as fp:
+                fp.write('\n' + message.content)
 
         # Ben meme trackers
         if '/ck/' in message.content and message.author.name == "Ben.H":
