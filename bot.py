@@ -24,7 +24,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.0"
+version = "v0.10.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -147,8 +147,6 @@ def on_message(message):
     # print messages to terminal for info
     print(message.author.name + ': ' + message.content)
 
-
-
     # ensure we store this user's ID
     if message.author.name not in users:
         users[message.author.name] = message.author.id
@@ -258,10 +256,13 @@ def on_message(message):
 
         elif message.content.startswith('.markov'):
             # generate a markov chain sentence based on the user's chat history
-            tmp = message.content[8:].split(' ',1)
-            if os.path.isfile('./markovs/' + users[tmp[0]]):
-                mc = markov.Markov(open('./markovs/' + users[tmp[0]]))
-                yield from client.send_message(message.channel, mc.generate_text())
+            tmp = message.content[8:]
+            if os.path.isfile('./markovs/' + users[tmp]):
+                mc = markov.Markov(open('./markovs/' + users[tmp]))
+                try:
+                    yield from client.send_message(message.channel, mc.generate_text())
+                except KeyError:
+                    yield from client.send_message(message.channel, 'Something went wrong :( Maybe you haven\'t spoken enough yet?')
             else:
                 yield from client.send_message(message.channel, 'I haven\'t seen that user speak yet!')
 
