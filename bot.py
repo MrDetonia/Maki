@@ -25,7 +25,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.7"
+version = "v0.10.8"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -266,7 +266,15 @@ def on_message(message):
 
         elif message.content.startswith('.markov'):
             # send typing signal to discord
-            yield from client.send_typing(message.channel)
+            for attempt in range(5):
+                try:
+                    yield from client.send_typing(message.channel)
+                except discord.errors.HTTPException:
+                    continue
+                else:
+                    break
+            else:
+                print('ERROR: Failed to send typing signal to discord after 5 attempts')
 
             # generate a markov chain sentence based on the user's chat history
             tmp = message.content[8:]
