@@ -25,7 +25,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.6"
+version = "v0.10.7"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -265,6 +265,9 @@ def on_message(message):
             response = message.content[5:]
 
         elif message.content.startswith('.markov'):
+            # send typing signal to discord
+            yield from client.send_typing(message.channel)
+
             # generate a markov chain sentence based on the user's chat history
             tmp = message.content[8:]
             if tmp in users and os.path.isfile('./markovs/' + users[tmp]):
