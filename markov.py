@@ -41,5 +41,6 @@ class Markov(object):
                 w1, w2 = w2, random.choice(self.cache[w2])
             except KeyError:
                 break
+        gen_words.append(w1)
         gen_words.append(w2)
         return ' '.join(gen_words)
