@@ -15,30 +15,30 @@ class Markov(object):
         words = data.split()
         return words
 
-    def triples(self):
-        if len(self.words) < 3:
+    def doubles(self):
+        if len(self.words) < 2:
             return
 
-        for i in range(len(self.words) - 2):
-            yield (self.words[i], self.words[i+1], self.words[i+2])
+        for i in range(len(self.words) - 1):
+            yield (self.words[i], self.words[i+1])
 
     def database(self):
-        for w1, w2, w3 in self.triples():
-            key = (w1, w2)
+        for w1, w2 in self.doubles():
+            key = w1
             if key in self.cache:
-                self.cache[key].append(w3)
+                self.cache[key].append(w2)
             else:
-                self.cache[key] = [w3]
+                self.cache[key] = [w2]
 
     def generate_text(self, size=25):
-        seed = random.randint(0, self.word_size - 3)
+        seed = random.randint(0, self.word_size - 2)
         seed_word, next_word = self.words[seed], self.words[seed+1]
         w1, w2 = seed_word, next_word
         gen_words = []
         for i in range(size):
             gen_words.append(w1)
             try:
-                w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+                w1, w2 = w2, random.choice(self.cache[w2])
             except KeyError:
                 break
         gen_words.append(w2)

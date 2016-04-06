@@ -25,7 +25,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.8"
+version = "v0.10.9"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
