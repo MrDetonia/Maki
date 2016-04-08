@@ -25,7 +25,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.10.10"
+version = "v0.11.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -42,6 +42,7 @@ My commands are:
 .seen <user> - prints when user was last seen
 .tell <user> <message> - send message to user when they are next active
 .say <msg> - say something
+.sayy <msg> - say something a e s t h e t i c a l l y
 .markov <user> - generate sentence using markov chains over a user's chat history
 ```"""
 
@@ -207,7 +208,7 @@ def on_message(message):
             # show info about user
             response = 'User: ' + message.author.name + ' ID: ' + message.author.id + ' Discriminator: ' + message.author.discriminator + '\nAccount Created: ' + strfromdt(message.author.created_at)
 
-        elif message.content.startswith('.whois'):
+        elif message.content.startswith('.whois '):
             # show info about another user
             tmp = message.content[7:]
             if tmp in users:
@@ -216,7 +217,7 @@ def on_message(message):
             else:
                 response = 'I haven\'t seen ' + tmp + ' yet! :('
 
-        elif message.content.startswith('.welcome'):
+        elif message.content.startswith('.welcome '):
             # manage welcome messages
             if message.author.id in admins:
                 tmp = message.content[9:].split(' ',1)
@@ -230,7 +231,7 @@ def on_message(message):
             with open('welcomes.json', 'w') as fp:
                 json.dump(welcomes, fp)
 
-        elif message.content.startswith('.seen'):
+        elif message.content.startswith('.seen '):
             # print when user was last seen
             target = message.content[6:]
             if target in history:
@@ -243,7 +244,7 @@ def on_message(message):
                 # user not logged
                 response = 'user not seen yet'
 
-        elif message.content.startswith('.tell'):
+        elif message.content.startswith('.tell '):
             # store message to tell user
             tmp = message.content[6:].split(' ',1)
             try:
@@ -258,13 +259,19 @@ def on_message(message):
             # let user know message is ready
             response = 'Okay ' + message.author.name + ', I\'ll tell ' + tmp[0] + ' when I next see them!'
 
-        elif message.content.startswith('.say'):
+        elif message.content.startswith('.say '):
             # delete calling message for effect
             yield from client.delete_message(message)
             # echo message
             response = message.content[5:]
 
-        elif message.content.startswith('.markov'):
+        elif message.content.startswith('.sayy '):
+            # delete calling message
+            yield from client.delete_message(message)
+            # echo aesthetic message
+            response = " ".join(message.content[6:])
+
+        elif message.content.startswith('.markov '):
             # send typing signal to discord
             for attempt in range(5):
                 try:
