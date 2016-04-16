@@ -25,7 +25,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.11.1"
+version = "v0.11.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -232,11 +232,11 @@ def on_message(message):
 
         elif message.content.startswith('.seen '):
             # print when user was last seen
-            target = message.content[6:]
+            target = users[message.content[6:]]
             if target in history:
                 # user logged, print last message and time
-                response = 'user ' + target + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1]))
-            elif target == 'Maki':
+                response = 'user ' + message.content[6:] + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1]))
+            elif message.content[6:] == 'Maki':
                 # Maki doesn't need to be .seen
                 response = 'I\'m right here!'
             else:
@@ -296,9 +296,10 @@ def on_message(message):
         # Stuff that happens when message is not a bot command:
         else:
             # log each message against users
-            history[message.author.name] = (message.content, time.time())
-            with open('hist.json', 'w') as fp:
-                json.dump(history, fp)
+            if message.content != "":
+                history[message.author.id] = (message.content, time.time())
+                with open('hist.json', 'w') as fp:
+                    json.dump(history, fp)
 
             # log user messages for markov chains, ignoring messages with certain substrings
             filters = ['```', 'http://', 'https://']
