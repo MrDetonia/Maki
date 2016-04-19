@@ -13,6 +13,8 @@ import time
 import datetime
 import random
 import json
+import logging
+
 import markov
 
 # file in this directory called "secret.py" should contain these variables
@@ -25,7 +27,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.11.2"
+version = "v0.12.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -86,6 +88,12 @@ if os.path.isfile('tells.json'):
 # this instance of the Discord client
 client = discord.Client()
 
+# logging setup
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 # FUNCTIONS
 
