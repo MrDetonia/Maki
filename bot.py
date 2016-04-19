@@ -27,7 +27,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.12.0"
+version = "v0.12.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -205,6 +205,7 @@ def on_message(message):
         elif message.content.startswith('.die'):
             if message.author.id in admins:
                 # exit discord and kill bot
+                print('INFO: Accepting .die from ' + message.author.name)
                 yield from client.send_message(message.channel, 'But will I dream? ;_;')
                 yield from client.logout()
             else:
