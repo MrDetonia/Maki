@@ -27,7 +27,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.12.1"
+version = "v0.12.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -87,6 +87,9 @@ if os.path.isfile('tells.json'):
 
 # this instance of the Discord client
 client = discord.Client()
+
+# are we running?
+run = True
 
 # logging setup
 logger = logging.getLogger('discord')
@@ -206,6 +209,7 @@ def on_message(message):
             if message.author.id in admins:
                 # exit discord and kill bot
                 print('INFO: Accepting .die from ' + message.author.name)
+                run = False
                 yield from client.send_message(message.channel, 'But will I dream? ;_;')
                 yield from client.logout()
             else:
@@ -345,4 +349,15 @@ def on_message(message):
 
 
 # Run the client
-client.run(email, pwd)
+while run:
+    try:
+        print('INFO: starting client')
+        client.run(email, pwd)
+    except:
+        print('ERROR: caught some exception')
+        continue
+    else:
+        break
+
+# finish execution
+exit(0)
