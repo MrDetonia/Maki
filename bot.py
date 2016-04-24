@@ -18,7 +18,7 @@ import logging
 import markov
 
 # file in this directory called "secret.py" should contain these variables
-from secret import email,pwd
+from secret import token
 
 
 # CONFIGURATION
@@ -27,7 +27,7 @@ from secret import email,pwd
 name = "Maki"
 
 # bot version
-version = "v0.12.2"
+version = "v0.13.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -349,15 +349,7 @@ def on_message(message):
 
 
 # Run the client
-while run:
-    try:
-        print('INFO: starting client')
-        client.run(email, pwd)
-    except:
-        print('ERROR: caught some exception')
-        continue
-    else:
-        break
+client.run(token)
 
 # finish execution
 exit(0)
