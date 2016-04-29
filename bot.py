@@ -9,6 +9,8 @@
 import discord
 import asyncio
 import os
+import io
+import sys
 import time
 import datetime
 import random
@@ -27,7 +29,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.13.0"
+version = "v0.13.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -347,6 +349,8 @@ def on_message(message):
             else:
                 print('ERROR: Failed to send message to discord after 5 attempts')
 
+# Setup stdout encoding
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding=sys.stdout.encoding, errors="backslashreplace", line_buffering=True)
 
 # Run the client
 client.run(token)
