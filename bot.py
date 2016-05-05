@@ -31,7 +31,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.15.0"
+version = "v0.15.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -126,7 +126,7 @@ def on_member_update(before, after):
             # print custom welcome
             yield from client.send_message(client.get_channel(def_chan), welcomes[after.id])
         else:
-            yield from client.send_message(client.get_channel(def_chan), after.name + ' is now online')
+            yield from client.send_message(client.get_channel(def_chan), after.name + ' is online. Set your welcome message with the `.welcome` command!')
 
 # called when message received
 @client.event
@@ -185,9 +185,12 @@ def on_message(message):
             # manage welcome messages
             if message.author.id in admins:
                 tmp = message.content[9:].split(' ',1)
-                target = message.server.get_member(tmp[0]).id
-                welcomes[target] = tmp[1]
-                response = 'Okay, I will now greet ' + message.server.get_member(target).name + ' with "' + tmp[1] + '"'
+                target = message.server.get_member_named(tmp[0])
+                if target == None:
+                    response = 'I can\'t find ' + tmp[0]
+                else:
+                    welcomes[target.id] = tmp[1]
+                    response = 'Okay, I will now greet ' + target.name + ' with "' + tmp[1] + '"'
             else:
                 welcomes[message.author.id] = message.content[9:]
                 response = 'Okay, I will now greet ' + message.author.name + ' with "' + message.content[9:] + '"'
