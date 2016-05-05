@@ -5,6 +5,7 @@
 # Copyright 2016 Zac Herd
 # Licensed under BSD 3-clause License, see LICENSE.md for more info
 
+
 # IMPORTS
 import discord
 import asyncio
@@ -14,6 +15,7 @@ import sys
 import time
 import datetime
 import random
+import re
 import json
 import logging
 
@@ -29,7 +31,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.13.1"
+version = "v0.15.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -47,6 +49,7 @@ My commands are:
 .say <msg> - say something
 .sayy <msg> - say something a e s t h e t i c a l l y
 .markov <user> - generate sentence using markov chains over a user's chat history
+.roll <x>d<y> - roll x number of y sided dice
 ```"""
 
 # IDs of admin users
@@ -55,13 +58,8 @@ admins = ['116883900688629761']
 # default posting channel
 def_chan = '116884620032606215'
 
-# GLOBALS
 
-# number of times Ben has mentioned his meme boards
-bentrack = {'ck':0, 'fit':0}
-if os.path.isfile('bentrack.json'):
-    with open('bentrack.json', 'r') as fp:
-        bentrack = json.load(fp)
+# GLOBALS
 
 # log of users' last messages and timestamps
 history = {}
@@ -75,12 +73,6 @@ if os.path.isfile('welcomes.json'):
     with open('welcomes.json', 'r') as fp:
         welcomes = json.load(fp)
 
-# seen users and IDs
-users = {}
-if os.path.isfile('users.json'):
-    with open('users.json', 'r') as fp:
-        users = json.load(fp)
-
 # messages left for users
 tells = {}
 if os.path.isfile('tells.json'):
@@ -90,15 +82,13 @@ if os.path.isfile('tells.json'):
 # this instance of the Discord client
 client = discord.Client()
 
-# are we running?
-run = True
-
 # logging setup
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+
 
 # FUNCTIONS
 
@@ -132,72 +122,32 @@ def on_ready():
 def on_member_update(before, after):
     # display welcome message if user comes online:
     if before.status == discord.Status.offline and after.status == discord.Status.online:
-        if after.name in welcomes:
+        if after.id in welcomes:
             # print custom welcome
-            yield from client.send_message(client.get_channel(def_chan), welcomes[after.name])
+            yield from client.send_message(client.get_channel(def_chan), welcomes[after.id])
         else:
             yield from client.send_message(client.get_channel(def_chan), after.name + ' is now online')
-
-    # track usernames and IDs:
-    if after.name not in users:
-        # store user ID
-        users[after.name] = after.id
-
-        # delete old entry if username changed
-        if after.name != before.name:
-            try:
-                users.pop(before.name, None)
-            except KeyError:
-                pass
-
-        # update JSON file
-        with open('users.json', 'w') as fp:
-            json.dump(users, fp)
 
 # called when message received
 @client.event
 @asyncio.coroutine
 def on_message(message):
     # print messages to terminal for info
-    print(message.author.name + ': ' + message.content)
-
-    # ensure we store this user's ID
-    if message.author.name not in users:
-        users[message.author.name] = message.author.id
-
-        # update JSON file
-        with open('users.json', 'w') as fp:
-            json.dump(users, fp)
+    try:
+        print(message.server.name + '-' + message.channel.name + '-' + message.author.name + ': ' + message.content)
+    except AttributeError:
+        print('PRIV-' + message.author.name + ': ' + message.content)
 
     # do not parse own messages or private messages
     if message.author != client.user and type(message.channel) is not discord.PrivateChannel:
         # response to send to channel
         response = ''
 
-        # send any messages we have for author:
-        if message.author.name in tells:
-            for msg in tells[message.author.name]:
-                for attempt in range(5):
-                    try:
-                        yield from client.send_message(message.author, msg[0] + ' says "' + msg[1] + '"')
-                    except discord.errors.HTTPException:
-                        continue
-                    else:
-                        break
-                else:
-                    print('ERROR: Failed to send private message after 5 attempts')
-
-            # delete this user's entry
-            del tells[message.author.name]
-
-            # update messages
-            with open('tells.json', 'w') as fp:
-                json.dump(tells, fp)
-
         # parse messages for commands
         if message.content.startswith('.info'):
             # print bot info
-            response = 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python 3.4 | discord.py ' + discord.__version__
+            pyver = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
+            response = 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python ' + pyver + ' | discord.py ' + discord.__version__
 
         elif message.content.startswith('.help'):
             # print command list
@@ -225,20 +175,21 @@ def on_message(message):
         elif message.content.startswith('.whois '):
             # show info about another user
             tmp = message.content[7:]
-            if tmp in users:
-                user = message.server.get_member(users[tmp])
-                response = 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at)
+            user = message.server.get_member_named(tmp)
+            if user == None:
+                response = 'I can\'t find ' + tmp
             else:
-                response = 'I haven\'t seen ' + tmp + ' yet! :('
+                response = 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at)
 
         elif message.content.startswith('.welcome '):
             # manage welcome messages
             if message.author.id in admins:
                 tmp = message.content[9:].split(' ',1)
-                welcomes[tmp[0]] = tmp[1]
-                response = 'Okay, I will now greet ' + tmp[0] + ' with "' + tmp[1] + '"'
+                target = message.server.get_member(tmp[0]).id
+                welcomes[target] = tmp[1]
+                response = 'Okay, I will now greet ' + message.server.get_member(target).name + ' with "' + tmp[1] + '"'
             else:
-                welcomes[message.author.name] = message.content[9:]
+                welcomes[message.author.id] = message.content[9:]
                 response = 'Okay, I will now greet ' + message.author.name + ' with "' + message.content[9:] + '"'
 
             # save welcomes
@@ -247,7 +198,8 @@ def on_message(message):
 
         elif message.content.startswith('.seen '):
             # print when user was last seen
-            target = users[message.content[6:]]
+            target = message.server.get_member_named(message.content[6:]).id
+
             if target in history:
                 # user logged, print last message and time
                 response = 'user ' + message.content[6:] + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1]))
@@ -257,21 +209,6 @@ def on_message(message):
             else:
                 # user not logged
                 response = 'user not seen yet'
-
-        elif message.content.startswith('.tell '):
-            # store message to tell user
-            tmp = message.content[6:].split(' ',1)
-            try:
-                tells[tmp[0]].append((message.author.name, tmp[1]))
-            except (NameError, KeyError):
-                tells[tmp[0]] = [(message.author.name, tmp[1])]
-
-            # save messages
-            with open('tells.json', 'w') as fp:
-                json.dump(tells, fp)
-
-            # let user know message is ready
-            response = 'Okay ' + message.author.name + ', I\'ll tell ' + tmp[0] + ' when I next see them!'
 
         elif message.content.startswith('.say '):
             # delete calling message for effect
@@ -299,14 +236,36 @@ def on_message(message):
 
             # generate a markov chain sentence based on the user's chat history
             tmp = message.content[8:]
-            if tmp in users and os.path.isfile('./markovs/' + users[tmp]):
-                mc = markov.Markov(open('./markovs/' + users[tmp]))
-                try:
-                    response = mc.generate_text(random.randint(20,40))
-                except KeyError:
-                    response = 'Something went wrong :( Maybe you haven\'t spoken enough yet?'
+            target = message.server.get_member_named(tmp).id
+            if os.path.isfile('./markovs/' + target):
+                mc = markov.Markov(open('./markovs/' + target))
+                response = mc.generate_text(random.randint(20,40))
             else:
-                response = 'I haven\'t seen that user speak yet!'
+                response = 'I haven\'t seen them speak yet!'
+
+        elif message.content.startswith('.roll '):
+            # DnD style dice roll
+            tmp = message.content[6:]
+
+            #check syntax is valid
+            pattern = re.compile('^([0-9]+)d([0-9]+)$')
+
+            if pattern.match(tmp):
+                # extract numbers
+                nums = [int(s) for s in re.findall(r'\d+', message.content)]
+
+                # limit range
+                if nums[0] > 100: nums[0] = 100
+                if nums[1] > 1000000: nums[1] = 1000000
+
+                # roll dice multiple times and sum
+                rollsum = 0
+                for i in range(nums[0]):
+                    rollsum += random.randint(1, nums[1])
+
+                response = 'You rolled: ' + str(rollsum)
+            else:
+                response = 'you did it wrong!'
 
         # Stuff that happens when message is not a bot command:
         else:
@@ -322,21 +281,6 @@ def on_message(message):
                 with open('./markovs/' + message.author.id, 'a') as fp:
                     fp.write('\n' + message.content)
 
-        # Ben meme trackers
-        if '/ck/' in message.content and message.author.name == "Ben.H":
-            bentrack['ck'] += 1
-            response = 'I have seen Ben reference /ck/ ' + str(bentrack['ck']) + ' times now.'
-            # save count
-            with open('bentrack.json', 'w') as fp:
-                json.dump(bentrack, fp)
-
-        elif '/fit/' in message.content and message.author.name == "Ben.H":
-            bentrack['fit'] += 1
-            response = 'I have seen Ben reference /fit/ ' + str(bentrack['fit']) + ' times now.'
-            # save count
-            with open('bentrack.json', 'w') as fp:
-                json.dump(bentrack, fp)
-
         # send response to channel if needed:
         if response is not '':
             for attempt in range(5):
@@ -348,9 +292,6 @@ def on_message(message):
                     break
             else:
                 print('ERROR: Failed to send message to discord after 5 attempts')
-
-# Setup stdout encoding
-sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding=sys.stdout.encoding, errors="backslashreplace", line_buffering=True)
 
 # Run the client
 client.run(token)
