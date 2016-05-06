@@ -31,7 +31,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.15.1"
+version = "v0.15.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -133,10 +133,11 @@ def on_member_update(before, after):
 @asyncio.coroutine
 def on_message(message):
     # print messages to terminal for info
+    timestr = time.strftime('%Y-%m-%d-%H:%M:%S: ')
     try:
-        print(message.server.name + '-' + message.channel.name + '-' + message.author.name + ': ' + message.content)
+        print(timestr + message.server.name + ' ' + message.channel.name + ' ' + message.author.name + ': ' + message.content)
     except AttributeError:
-        print('PRIV-' + message.author.name + ': ' + message.content)
+        print(timestr + 'PRIV ' + message.author.name + ': ' + message.content)
 
     # do not parse own messages or private messages
     if message.author != client.user and type(message.channel) is not discord.PrivateChannel:
