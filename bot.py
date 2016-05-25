@@ -12,6 +12,8 @@ import asyncio
 import os
 import io
 import sys
+import shlex
+import subprocess
 import time
 import datetime
 import random
@@ -31,7 +33,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.15.2"
+version = "v0.16.0"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -50,6 +52,7 @@ My commands are:
 .sayy <msg> - say something a e s t h e t i c a l l y
 .markov <user> - generate sentence using markov chains over a user's chat history
 .roll <x>d<y> - roll x number of y sided dice
+.qr <msg> - generate a QR code
 ```"""
 
 # IDs of admin users
@@ -270,6 +273,45 @@ def on_message(message):
                 response = 'You rolled: ' + str(rollsum)
             else:
                 response = 'you did it wrong!'
+
+        elif message.content.startswith('.qr '):
+            # generate QR code - DANGEROUS, CHECK CAREFULLY HERE
+            tmp = message.content[4:]
+
+            # send typing signal to discord
+            for attempt in range(5):
+                try:
+                    yield from client.send_typing(message.channel)
+                except discord.errors.HTTPException:
+                    continue
+                else:
+                    break
+            else:
+                print('ERROR: Failed to send typing signal to discord after 5 attempts')
+
+            # make sure there are no nasty characters
+            msg = re.sub(r'[^a-zA-Z0-9_ -]', '', tmp, 0)
+
+            # echo message
+            cmd = 'echo "\'' + msg + '\'"'
+            args = shlex.split(cmd)
+            echo = subprocess.Popen(args, stdout=subprocess.PIPE)
+
+            # generate QR code
+            cmd = 'qrencode -t png -o -'
+            args = shlex.split(cmd)
+            qr = subprocess.Popen(args, stdin=echo.stdout, stdout=subprocess.PIPE)
+
+            # upload file with curl and get URL
+            cmd = 'curl -F upload=@- https://w1r3.net'
+            args = shlex.split(cmd)
+            out = subprocess.check_output(args, stdin=qr.stdout)
+
+            # run piped commands
+            echo.wait()
+
+            # send response
+            response = out.decode('utf-8').strip()
 
         # Stuff that happens when message is not a bot command:
         else:
