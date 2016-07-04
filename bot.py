@@ -33,7 +33,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.16.0"
+version = "v0.16.1"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -47,7 +47,6 @@ My commands are:
 .whois <user> - displays another user's info
 .welcome <message> - set your own welcome message
 .seen <user> - prints when user was last seen
-.tell <user> <message> - send message to user when they are next active
 .say <msg> - say something
 .sayy <msg> - say something a e s t h e t i c a l l y
 .markov <user> - generate sentence using markov chains over a user's chat history
@@ -75,12 +74,6 @@ welcomes = {}
 if os.path.isfile('welcomes.json'):
     with open('welcomes.json', 'r') as fp:
         welcomes = json.load(fp)
-
-# messages left for users
-tells = {}
-if os.path.isfile('tells.json'):
-    with open('tells.json', 'r') as fp:
-        tells = json.load(fp)
 
 # this instance of the Discord client
 client = discord.Client()
@@ -159,7 +152,7 @@ def on_message(message):
 
         elif message.content.startswith('.upskirt'):
             # link to source code
-            response = 'No, don\'t look at my pantsu! Baka! <https://27b-a.xyz:55555/mrdetonia/Maki>'
+            response = 'No, don\'t look at my pantsu! Baka! <https://gitla.in/MrDetonia/maki>'
 
         elif message.content.startswith('.die'):
             if message.author.id in admins:
@@ -227,7 +220,7 @@ def on_message(message):
             # delete calling message
             yield from client.delete_message(message)
             # echo aesthetic message
-            response = " ".join(message.content[6:])
+            response = ' '.join(message.content[6:])
 
         elif message.content.startswith('.markov '):
             # send typing signal to discord
