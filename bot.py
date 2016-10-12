@@ -33,7 +33,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.16.4"
+version = "v0.16.5"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -48,7 +48,7 @@ My commands are:
 .seen <user> - prints when user was last seen
 .say <msg> - say something
 .sayy <msg> - say something a e s t h e t i c a l l y
-.markov <user> - generate sentence using markov chains over a user's chat history
+.markov [<user>] - generate markov chain over chat history; a blank user will use you
 .roll <x>d<y> - roll x number of y sided dice
 .qr <msg> - generate a QR code
 ```"""
@@ -182,7 +182,7 @@ def on_message(message):
             # echo aesthetic message
             response = ' '.join(message.content[6:])
 
-        elif message.content.startswith('.markov '):
+        elif message.content.startswith('.markov'):
             # send typing signal to discord
             for attempt in range(5):
                 try:
@@ -196,12 +196,22 @@ def on_message(message):
 
             # generate a markov chain sentence based on the user's chat history
             tmp = message.content[8:]
-            target = message.server.get_member_named(tmp).id
-            if os.path.isfile('./markovs/' + target):
+            target = ''
+
+            # if no user provided, markov the author
+            if tmp == '':
+                target = message.author.id
+            else:
+                try:
+                    target = message.server.get_member_named(tmp).id
+                except AttributeError:
+                    response = "I can't find that user!"
+
+            if os.path.isfile('./markovs/' + target) and target != '':
                 mc = markov.Markov(open('./markovs/' + target))
                 response = mc.generate_text(random.randint(20,40))
-            else:
-                response = 'I haven\'t seen them speak yet!'
+            elif target != '':
+                response = "I haven't seen them speak yet!"
 
         elif message.content.startswith('.roll '):
             # DnD style dice roll
