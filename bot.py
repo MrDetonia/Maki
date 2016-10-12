@@ -33,7 +33,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.16.1"
+version = "v0.16.2"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -45,7 +45,6 @@ My commands are:
 .upskirt - show a link to my source
 .whoami - displays your user info
 .whois <user> - displays another user's info
-.welcome <message> - set your own welcome message
 .seen <user> - prints when user was last seen
 .say <msg> - say something
 .sayy <msg> - say something a e s t h e t i c a l l y
@@ -57,9 +56,6 @@ My commands are:
 # IDs of admin users
 admins = ['116883900688629761']
 
-# default posting channel
-def_chan = '116884620032606215'
-
 
 # GLOBALS
 
@@ -68,12 +64,6 @@ history = {}
 if os.path.isfile('hist.json'):
     with open('hist.json', 'r') as fp:
         history = json.load(fp)
-
-# user welcome messages
-welcomes = {}
-if os.path.isfile('welcomes.json'):
-    with open('welcomes.json', 'r') as fp:
-        welcomes = json.load(fp)
 
 # this instance of the Discord client
 client = discord.Client()
@@ -111,18 +101,6 @@ def on_ready():
     # set "Now Playing" to print version
     game = discord.Game(name = version)
     yield from client.change_status(game, False)
-
-# called when member updates
-@client.event
-@asyncio.coroutine
-def on_member_update(before, after):
-    # display welcome message if user comes online:
-    if before.status == discord.Status.offline and after.status == discord.Status.online:
-        if after.id in welcomes:
-            # print custom welcome
-            yield from client.send_message(client.get_channel(def_chan), welcomes[after.id])
-        else:
-            yield from client.send_message(client.get_channel(def_chan), after.name + ' is online. Set your welcome message with the `.welcome` command!')
 
 # called when message received
 @client.event
@@ -177,24 +155,6 @@ def on_message(message):
                 response = 'I can\'t find ' + tmp
             else:
                 response = 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at)
-
-        elif message.content.startswith('.welcome '):
-            # manage welcome messages
-            if message.author.id in admins:
-                tmp = message.content[9:].split(' ',1)
-                target = message.server.get_member_named(tmp[0])
-                if target == None:
-                    response = 'I can\'t find ' + tmp[0]
-                else:
-                    welcomes[target.id] = tmp[1]
-                    response = 'Okay, I will now greet ' + target.name + ' with "' + tmp[1] + '"'
-            else:
-                welcomes[message.author.id] = message.content[9:]
-                response = 'Okay, I will now greet ' + message.author.name + ' with "' + message.content[9:] + '"'
-
-            # save welcomes
-            with open('welcomes.json', 'w') as fp:
-                json.dump(welcomes, fp)
 
         elif message.content.startswith('.seen '):
             # print when user was last seen
