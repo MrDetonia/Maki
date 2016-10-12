@@ -33,7 +33,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.16.2"
+version = "v0.16.3"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -100,7 +100,7 @@ def on_ready():
 
     # set "Now Playing" to print version
     game = discord.Game(name = version)
-    yield from client.change_status(game, False)
+    yield from client.change_presence(game=game)
 
 # called when message received
 @client.event
