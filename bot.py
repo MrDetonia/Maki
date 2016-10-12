@@ -29,14 +29,11 @@ from secret import token
 
 # CONFIGURATION
 
-# reported bot name
-name = "Maki"
-
 # bot version
-version = "v0.16.5"
+version = "v0.16.6"
 
 # text shown by .help command
-helptext = """I am a bot written in Python by MrDetonia
+helptext = """I am a Discord bot written in Python
 
 My commands are:
 ```
@@ -122,7 +119,8 @@ def on_message(message):
         if message.content.startswith('.info'):
             # print bot info
             pyver = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
-            response = 'I am ' + name + ', a Discord bot by MrDetonia | ' + version + ' | Python ' + pyver + ' | discord.py ' + discord.__version__
+            appinfo = yield from client.application_info()
+            response = 'I am ' + appinfo.name + ', a Discord bot by ' + appinfo.owner.name + ' | ' + version + ' | Python ' + pyver + ' | discord.py ' + discord.__version__
 
         elif message.content.startswith('.help'):
             # print command list
