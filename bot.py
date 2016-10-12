@@ -33,7 +33,7 @@ from secret import token
 name = "Maki"
 
 # bot version
-version = "v0.16.3"
+version = "v0.16.4"
 
 # text shown by .help command
 helptext = """I am a bot written in Python by MrDetonia
@@ -215,6 +215,8 @@ def on_message(message):
                 nums = [int(s) for s in re.findall(r'\d+', message.content)]
 
                 # limit range
+                if nums[0] < 1: nums[0] = 1
+                if nums[1] < 1: nums[1] = 1
                 if nums[0] > 100: nums[0] = 100
                 if nums[1] > 1000000: nums[1] = 1000000
 
@@ -223,7 +225,7 @@ def on_message(message):
                 for i in range(nums[0]):
                     rollsum += random.randint(1, nums[1])
 
-                response = 'You rolled: ' + str(rollsum)
+                response = 'Using ' + str(nums[0]) + 'd' + str(nums[1]) + ' you rolled: ' + str(rollsum)
             else:
                 response = 'you did it wrong!'
 
