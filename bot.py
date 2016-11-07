@@ -30,7 +30,7 @@ from secret import token
 # CONFIGURATION
 
 # bot version
-version = "v0.16.7"
+version = "v0.16.8"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -299,7 +299,7 @@ def on_message(message):
                     pass
 
             # someone noticed me! <3
-            if "Maki" in message.content or "maki" in message.content:
+            if bool(re.search(r'\b[Mm][Aa][Kk][Ii]\b', message.content)):
                 yield from client.add_reaction(message, '\N{BLACK HEART SUIT}')
 
         # send response to channel if needed:
