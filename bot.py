@@ -30,7 +30,7 @@ from secret import token
 # CONFIGURATION
 
 # bot version
-version = "v0.16.6"
+version = "v0.16.7"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -103,6 +103,7 @@ def on_ready():
 @client.event
 @asyncio.coroutine
 def on_message(message):
+
     # print messages to terminal for info
     timestr = time.strftime('%Y-%m-%d-%H:%M:%S: ')
     try:
@@ -156,7 +157,11 @@ def on_message(message):
 
         elif message.content.startswith('.seen '):
             # print when user was last seen
-            target = message.server.get_member_named(message.content[6:]).id
+            try:
+                target = message.server.get_member_named(message.content[6:]).id
+            except AttributeError:
+                response = "user not seen yet"
+                target = ""
 
             if target in history:
                 # user logged, print last message and time
@@ -166,7 +171,7 @@ def on_message(message):
                 response = 'I\'m right here!'
             else:
                 # user not logged
-                response = 'user not seen yet'
+                response = "user not seen yet"
 
         elif message.content.startswith('.say '):
             # delete calling message for effect
@@ -287,8 +292,15 @@ def on_message(message):
             # log user messages for markov chains, ignoring messages with certain substrings
             filters = ['```', 'http://', 'https://']
             if not any(x in message.content for x in filters):
-                with open('./markovs/' + message.author.id, 'a') as fp:
-                    fp.write('\n' + message.content)
+                try:
+                    with open('./markovs/' + message.author.id, 'a') as fp:
+                        fp.write('\n' + message.content)
+                except PermissionError:
+                    pass
+
+            # someone noticed me! <3
+            if "Maki" in message.content or "maki" in message.content:
+                yield from client.add_reaction(message, '\N{BLACK HEART SUIT}')
 
         # send response to channel if needed:
         if response is not '':
