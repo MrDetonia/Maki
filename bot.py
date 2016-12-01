@@ -11,6 +11,8 @@ import discord
 import asyncio
 import os
 import io
+import urllib3
+from html.parser import HTMLParser
 import sys
 import shlex
 import subprocess
@@ -24,13 +26,13 @@ import logging
 import markov
 
 # file in this directory called "secret.py" should contain these variables
-from secret import token
+from secret import token, lfmkey
 
 
 # CONFIGURATION
 
 # bot version
-version = "v0.16.8"
+version = "v0.17.0"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -45,9 +47,10 @@ My commands are:
 .seen <user> - prints when user was last seen
 .say <msg> - say something
 .sayy <msg> - say something a e s t h e t i c a l l y
-.markov [<user>] - generate markov chain over chat history; a blank user will use you
+.markov [<user>] - generate markov chain over chat history for you or another user
 .roll <x>d<y> - roll x number of y sided dice
 .qr <msg> - generate a QR code
+.np [<user>] - fetch now playing from last.fm for you or a specific username
 ```"""
 
 # IDs of admin users
@@ -72,6 +75,8 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
+# init urllib3 pool manager
+http = urllib3.PoolManager()
 
 # FUNCTIONS
 
@@ -82,6 +87,40 @@ def strfromdt(dt):
 # converts a timestamp to a datetime
 def dtfromts(ts):
     return datetime.datetime.fromtimestamp(ts)
+
+# gets now playing information from last.fm
+def lastfm_np(username):
+    # fetch xml from last.fm
+    r = http.request("GET", "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + username + "&limit=1&api_key=" + lfmkey)
+
+    if r.status != 200:
+        return "Couldn't get last.fm data for " + username
+
+    xml = r.data.decode('utf-8')
+
+    # un-fuck text
+    h = HTMLParser()
+    xml = h.unescape(xml)
+
+    # isolate fields
+    username = xml.split('" page="')[0].split('<recenttracks user="')[1]
+    artist = xml.split('</artist>')[0].split('>')[-1]
+    song = xml.split('</name>')[0].split('<name>')[1]
+    album = xml.split('</album>')[0].split('>')[-1]
+
+    # grammar
+    if album != "":
+        albumtext = "` from the album `" + album + "`"
+    else:
+        albumtext = "`"
+
+    if xml.find("track nowplaying=\"true\">") == -1:
+        nowplaying = " last listened"
+    else:
+        nowplaying = " is listening"
+
+    # construct string
+    return username + nowplaying + " to `" + song + "` by `" + artist + albumtext
 
 
 # EVENT HANDLERS
@@ -241,6 +280,14 @@ def on_message(message):
                 response = 'Using ' + str(nums[0]) + 'd' + str(nums[1]) + ' you rolled: ' + str(rollsum)
             else:
                 response = 'you did it wrong!'
+
+        elif message.content.startswith('.np'):
+            tmp = message.content[4:]
+
+            if tmp == '':
+                response = lastfm_np(message.author.name)
+            else:
+                response = lastfm_np(tmp)
 
         elif message.content.startswith('.qr '):
             # generate QR code - DANGEROUS, CHECK CAREFULLY HERE
