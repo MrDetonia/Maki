@@ -32,7 +32,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.17.1"
+version = "v0.17.2"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -340,10 +340,10 @@ def on_message(message):
                     json.dump(history, fp)
 
             # log user messages for markov chains, ignoring messages with certain substrings
-            filters = ['```', 'http://', 'https://']
+            filters = ['`', 'http://', 'https://']
             if not any(x in message.content for x in filters):
                 try:
-                    with open('./markovs/' + message.author.id, 'a') as fp:
+                    with open('./markovs/' + message.server.id + '-' + message.author.id, 'a') as fp:
                         fp.write('\n' + message.content)
                 except PermissionError:
                     pass
