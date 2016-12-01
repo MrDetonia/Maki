@@ -350,6 +350,10 @@ def on_message(message):
             if bool(re.search(r'\b[Mm][Aa][Kk][Ii]\b', message.content)):
                 yield from client.add_reaction(message, '\N{BLACK HEART SUIT}')
 
+            # butter
+            if bool(re.search(r'\b[Bb][Uu][Tt][Tt][Ee][Rr]\b', message.content)):
+                yield from client.add_reaction(message, '\N{PERSON WITH FOLDED HANDS}')
+
         # send response to channel if needed:
         if response is not '':
             for attempt in range(5):
