@@ -245,15 +245,15 @@ def on_message(message):
 
             # if no user provided, markov the author
             if tmp == '':
-                target = message.author.id
+                target = message.server.id + '-' + message.author.id
             else:
                 try:
-                    target = message.server.get_member_named(tmp).id
+                    target = message.server.id + '-' + message.server.get_member_named(tmp).id
                 except AttributeError:
                     response = "I can't find that user!"
 
             if os.path.isfile('./markovs/' + target) and target != '':
-                mc = markov.Markov(open('./markovs/' + message.server.id + '-' + target))
+                mc = markov.Markov(open('./markovs/' + target))
                 response = mc.generate_text(random.randint(20,40))
             elif target != '':
                 response = "I haven't seen them speak yet!"
