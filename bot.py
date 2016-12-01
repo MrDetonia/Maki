@@ -32,7 +32,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.17.0"
+version = "v0.17.1"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -90,8 +90,11 @@ def dtfromts(ts):
 
 # gets now playing information from last.fm
 def lastfm_np(username):
+    # sanitise username
+    cleanusername = re.sub(r'[^a-zA-Z0-9_-]', '', username, 0)
+
     # fetch xml from last.fm
-    r = http.request("GET", "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + username + "&limit=1&api_key=" + lfmkey)
+    r = http.request("GET", "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + cleanusername + "&limit=1&api_key=" + lfmkey)
 
     if r.status != 200:
         return "Couldn't get last.fm data for " + username
