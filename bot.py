@@ -31,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.17.5"
+version = "v0.18.0"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -177,6 +177,11 @@ def on_message(message):
                 run = False
                 yield from client.send_message(message.channel, 'But will I dream? ;_;')
                 yield from client.logout()
+
+                if message.content[5:] == 'reload':
+                    # touch a file called 'reload' which signals we should restart
+                    with open('reload', 'a'):
+                        os.utime('reload', None)
             else:
                 # user not admin, refuse
                 response = 'Don\'t be so rude! >:('
