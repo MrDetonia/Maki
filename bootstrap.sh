@@ -21,12 +21,10 @@ do
     runuser -m $puser -c 'rm -f ./reload'
     runuser -m $puser -c 'python3 bot.py'
 
-    # okay to quit if rval was not 0
+    # okay to quit if there is no reload file
     if [ ! -f ./reload ]
     then
         echo no reload file, stopping for realsies...
         exit
     fi
 done
-
-exit
