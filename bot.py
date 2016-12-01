@@ -11,8 +11,7 @@ import discord
 import asyncio
 import os
 import io
-import urllib3
-from html.parser import HTMLParser
+import requests
 import sys
 import shlex
 import subprocess
@@ -32,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.17.3"
+version = "v0.17.4"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -75,9 +74,6 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-# init urllib3 pool manager
-http = urllib3.PoolManager()
-
 # FUNCTIONS
 
 # converts a datetime to a string
@@ -93,23 +89,24 @@ def lastfm_np(username):
     # sanitise username
     cleanusername = re.sub(r'[^a-zA-Z0-9_-]', '', username, 0)
 
-    # fetch xml from last.fm
-    r = http.request("GET", "https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + cleanusername + "&limit=1&api_key=" + lfmkey)
+    # fetch JSON from last.fm
+    payload = {'format': 'json', 'method': 'user.getRecentTracks', 'user': cleanusername, 'limit': '1', 'api_key': lfmkey}
+    r = requests.get("http://ws.audioscrobbler.com/2.0/", params=payload)
 
-    if r.status != 200:
+    # read json data
+    np = r.json()
+
+    # check we got a valid response
+    if 'error' in np:
         return "Couldn't get last.fm data for " + username
 
-    xml = r.data.decode('utf-8')
-
-    # un-fuck text
-    h = HTMLParser()
-    xml = h.unescape(xml)
-
-    # isolate fields
-    username = xml.split('" page="')[0].split('<recenttracks user="')[1]
-    artist = xml.split('</artist>')[0].split('>')[-1]
-    song = xml.split('</name>')[0].split('<name>')[1]
-    album = xml.split('</album>')[0].split('>')[-1]
+    # get fields
+    username = np['recenttracks']['@attr']['user']
+    track = np['recenttracks']['track'][0]
+    album = track['album']['#text']
+    artist = track['artist']['#text']
+    song = track['name']
+    nowplaying = '@attr' in track
 
     # grammar
     if album != "":
@@ -117,10 +114,10 @@ def lastfm_np(username):
     else:
         albumtext = "`"
 
-    if xml.find("track nowplaying=\"true\">") == -1:
-        nowplaying = " last listened"
-    else:
+    if nowplaying == True:
         nowplaying = " is listening"
+    else:
+        nowplaying = " last listened"
 
     # construct string
     return username + nowplaying + " to `" + song + "` by `" + artist + albumtext
