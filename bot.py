@@ -31,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.17.4"
+version = "v0.17.5"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -240,20 +240,23 @@ def on_message(message):
             tmp = message.content[8:]
             target = ''
 
-            # if no user provided, markov the author
-            if tmp == '':
-                target = message.server.id + '-' + message.author.id
+            if tmp == 'Maki':
+                response = "My markovs always say the same thing."
             else:
-                try:
-                    target = message.server.id + '-' + message.server.get_member_named(tmp).id
-                except AttributeError:
-                    response = "I can't find that user!"
+                # if no user provided, markov the author
+                if tmp == '':
+                    target = message.server.id + '-' + message.author.id
+                else:
+                    try:
+                        target = message.server.id + '-' + message.server.get_member_named(tmp).id
+                    except AttributeError:
+                        response = "I can't find that user!"
 
-            if os.path.isfile('./markovs/' + target) and target != '':
-                mc = markov.Markov(open('./markovs/' + target))
-                response = mc.generate_text(random.randint(20,40))
-            elif target != '':
-                response = "I haven't seen them speak yet!"
+                if os.path.isfile('./markovs/' + target) and target != '':
+                    mc = markov.Markov(open('./markovs/' + target))
+                    response = mc.generate_text(random.randint(20,40))
+                elif target != '':
+                    response = "I haven't seen them speak yet!"
 
         elif message.content.startswith('.roll '):
             # DnD style dice roll
