@@ -32,7 +32,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.17.2"
+version = "v0.17.3"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -200,14 +200,14 @@ def on_message(message):
         elif message.content.startswith('.seen '):
             # print when user was last seen
             try:
-                target = message.server.get_member_named(message.content[6:]).id
+                target = message.server.id + message.server.get_member_named(message.content[6:]).id
             except AttributeError:
-                response = "user not seen yet"
+                response = "I can't find that user!"
                 target = ""
 
-            if target in history:
+            if target in history and history[target][0] == message.server.id:
                 # user logged, print last message and time
-                response = 'user ' + message.content[6:] + ' was last seen saying "' + history[target][0] + '" at ' + strfromdt(dtfromts(history[target][1]))
+                response = 'user ' + message.content[6:] + ' was last seen saying "' + history[target][2] + '" at ' + strfromdt(dtfromts(history[target][1]))
             elif message.content[6:] == 'Maki':
                 # Maki doesn't need to be .seen
                 response = 'I\'m right here!'
@@ -285,6 +285,7 @@ def on_message(message):
                 response = 'you did it wrong!'
 
         elif message.content.startswith('.np'):
+            # show now playing info from last.fm
             tmp = message.content[4:]
 
             if tmp == '':
@@ -335,7 +336,7 @@ def on_message(message):
         else:
             # log each message against users
             if message.content != "":
-                history[message.author.id] = (message.content, time.time())
+                history[message.server.id + message.author.id] = (message.server.id, time.time(), message.content)
                 with open('hist.json', 'w') as fp:
                     json.dump(history, fp)
 
