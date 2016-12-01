@@ -253,7 +253,7 @@ def on_message(message):
                     response = "I can't find that user!"
 
             if os.path.isfile('./markovs/' + target) and target != '':
-                mc = markov.Markov(open('./markovs/' + target))
+                mc = markov.Markov(open('./markovs/' + message.server.id + '-' + target))
                 response = mc.generate_text(random.randint(20,40))
             elif target != '':
                 response = "I haven't seen them speak yet!"
