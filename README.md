@@ -1,5 +1,5 @@
 # Maki - Discord bot written in Python
-### The bot that sits on PEEPBEEPMEMECREEP and does things.
+### The discord bot that does things.
 
 ---
 
