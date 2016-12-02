@@ -8,7 +8,7 @@ do
     date
 
     echo Updating repository...
-    runuser -m $puser -c 'git pull'
+    runuser -m $puser -c 'git pull origin master'
 
     # if root we can update discord.py
     if [ "$EUID" -eq 0 ]
