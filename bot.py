@@ -168,7 +168,7 @@ def on_message(message):
 
         elif message.content.startswith('.upskirt'):
             # link to source code
-            response = 'No, don\'t look at my pantsu! Baka! <https://gitla.in/MrDetonia/maki>'
+            response = 'No, don\'t look at my pantsu! Baka! <https://gitla.in/MrDetonia/maki> | <https://github.com/MrDetonia/Maki>'
 
         elif message.content.startswith('.die'):
             if message.author.id in admins:
