@@ -31,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.18.0"
+version = "v0.18.1"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -188,7 +188,7 @@ def on_message(message):
 
         elif message.content.startswith('.whoami'):
             # show info about user
-            response = 'User: ' + message.author.name + ' ID: ' + message.author.id + ' Discriminator: ' + message.author.discriminator + '\nAccount Created: ' + strfromdt(message.author.created_at)
+            response = 'User: `' + message.author.name + '` ID: `' + message.author.id + '` Discriminator: `' + message.author.discriminator + '`\nAccount Created: `' + strfromdt(message.author.created_at) + '`'
 
         elif message.content.startswith('.whois '):
             # show info about another user
@@ -197,7 +197,7 @@ def on_message(message):
             if user == None:
                 response = 'I can\'t find ' + tmp
             else:
-                response = 'User: ' + user.name + ' ID: ' + user.id + ' Discriminator: ' + user.discriminator + '\nAccount Created: ' + strfromdt(user.created_at)
+                response = 'User: `' + user.name + '` ID: `' + user.id + '` Discriminator: `' + user.discriminator + '`\nAccount Created: `' + strfromdt(user.created_at) + '`'
 
         elif message.content.startswith('.seen '):
             # print when user was last seen
