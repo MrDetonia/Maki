@@ -31,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.19.0"
+version = "v0.19.1"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -341,10 +341,13 @@ def on_message(message):
             response = out.decode('utf-8').strip()
 
         elif message.content.startswith('.quiet'):
-            quiet[message.server.id] = 1
+            if message.author.id in admins:
+                quiet[message.server.id] = 1
+            else
+                response = "No, *you* be quiet!"
 
         elif message.content.startswith('.loud'):
-            if message.server.id in quiet:
+            if message.server.id in quiet and message.author.id in admins:
                 quiet.pop(message.server.id, None)
 
         # Stuff that happens when message is not a bot command:
