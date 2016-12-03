@@ -343,7 +343,7 @@ def on_message(message):
         elif message.content.startswith('.quiet'):
             if message.author.id in admins:
                 quiet[message.server.id] = 1
-            else
+            else:
                 response = "No, *you* be quiet!"
 
         elif message.content.startswith('.loud'):
