@@ -31,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.18.1"
+version = "v0.19.0"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -63,6 +63,9 @@ history = {}
 if os.path.isfile('hist.json'):
     with open('hist.json', 'r') as fp:
         history = json.load(fp)
+
+# quiet modes
+quiet = {}
 
 # this instance of the Discord client
 client = discord.Client()
@@ -337,6 +340,13 @@ def on_message(message):
             # send response
             response = out.decode('utf-8').strip()
 
+        elif message.content.startswith('.quiet'):
+            quiet[message.server.id] = 1
+
+        elif message.content.startswith('.loud'):
+            if message.server.id in quiet:
+                quiet.pop(message.server.id, None)
+
         # Stuff that happens when message is not a bot command:
         else:
             # log each message against users
@@ -363,7 +373,7 @@ def on_message(message):
                 yield from client.add_reaction(message, '\N{PERSON WITH FOLDED HANDS}')
 
         # send response to channel if needed:
-        if response is not '':
+        if response is not '' and message.server.id not in quiet:
             for attempt in range(5):
                 try:
                     yield from client.send_message(message.channel, response)
