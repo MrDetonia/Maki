@@ -31,7 +31,7 @@ from secret import token, lfmkey
 # CONFIGURATION
 
 # bot version
-version = "v0.19.1"
+version = "v0.19.2"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -101,15 +101,18 @@ def lastfm_np(username):
 
     # check we got a valid response
     if 'error' in np:
-        return "Couldn't get last.fm data for " + username
+        return "I couldn't get last.fm data for " + username
 
     # get fields
-    username = np['recenttracks']['@attr']['user']
-    track = np['recenttracks']['track'][0]
-    album = track['album']['#text']
-    artist = track['artist']['#text']
-    song = track['name']
-    nowplaying = '@attr' in track
+    try:
+        username = np['recenttracks']['@attr']['user']
+        track = np['recenttracks']['track'][0]
+        album = track['album']['#text']
+        artist = track['artist']['#text']
+        song = track['name']
+        nowplaying = '@attr' in track
+    except IndexError:
+        return "It looks like " + username + " hasn't played anything recently."
 
     # grammar
     if album != "":
