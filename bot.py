@@ -378,6 +378,10 @@ def on_message(message):
             if bool(re.search(r'\b[Bb][Uu][Tt][Tt][Ee][Rr]\b', message.content)):
                 yield from client.add_reaction(message, '\N{PERSON WITH FOLDED HANDS}')
 
+            # egg
+            if bool(re.search(r'\b[Ee][Gg][Gg]\b', message.content)):
+                yield from client.add_reaction(message, '\N{AUBERGINE}')
+
         # send response to channel if needed:
         if response is not '' and message.server.id not in quiet:
             for attempt in range(5):
