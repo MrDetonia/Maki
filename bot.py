@@ -161,10 +161,10 @@ def steamdata(vanityname):
         namestr = dataresponse['personaname']
     else: namestr = ''
     if 'personastate' in dataresponse:
-        statestr = personastates[dataresponse['personastate']]
+        statestr = '`' + personastates[dataresponse['personastate']] + '`'
     else: statestr = ''
     if 'gameextrainfo' in dataresponse:
-        gamestr = ' playing ' + dataresponse['gameextrainfo']
+        gamestr = ' playing `' + dataresponse['gameextrainfo'] + '`'
     else: gamestr = ''
 
     responsetext = [(namestr + ' is ' + statestr + gamestr).replace('  ', ' ')]
