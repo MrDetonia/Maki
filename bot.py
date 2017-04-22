@@ -31,7 +31,7 @@ from secret import token, lfmkey, steamkey
 # CONFIGURATION
 
 # bot version
-version = "v0.19.2"
+version = "v0.20.0"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
