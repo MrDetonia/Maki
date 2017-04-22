@@ -31,7 +31,7 @@ from secret import token, lfmkey, steamkey
 # CONFIGURATION
 
 # bot version
-version = "v0.20.1"
+version = "v0.20.2"
 
 # text shown by .help command
 helptext = """I am a Discord bot written in Python
@@ -357,7 +357,6 @@ def on_message(message):
                 response = steamdata(tmp)
 
         elif message.content.startswith('.qr '):
-            # generate QR code - DANGEROUS, CHECK CAREFULLY HERE
             tmp = message.content[4:]
 
             # send typing signal to discord
@@ -371,26 +370,11 @@ def on_message(message):
             else:
                 print('ERROR: Failed to send typing signal to discord after 5 attempts')
 
-            # make sure there are no nasty characters
-            msg = re.sub(r'[^a-zA-Z0-9_ -]', '', tmp, 0)
-
-            # echo message
-            cmd = 'echo "\'' + msg + '\'"'
-            args = shlex.split(cmd)
-            echo = subprocess.Popen(args, stdout=subprocess.PIPE)
-
-            # generate QR code
-            cmd = 'qrencode -t png -o -'
-            args = shlex.split(cmd)
-            qr = subprocess.Popen(args, stdin=echo.stdout, stdout=subprocess.PIPE)
-
-            # upload file with curl and get URL
-            cmd = 'curl -F upload=@- https://w1r3.net'
-            args = shlex.split(cmd)
-            out = subprocess.check_output(args, stdin=qr.stdout)
-
-            # run piped commands
-            echo.wait()
+            # generate qr code
+            qr = subprocess.Popen('qrencode -t png -o -'.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            qr.stdin.write(tmp.encode('utf-8'))
+            qr.stdin.close()
+            out = subprocess.check_output('curl -F upload=@- https://w1r3.net'.split(), stdin=qr.stdout)
 
             # send response
             response = out.decode('utf-8').strip()
