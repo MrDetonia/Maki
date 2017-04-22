@@ -25,7 +25,7 @@ import logging
 import markov
 
 # file in this directory called "secret.py" should contain these variables
-from secret import token, lfmkey
+from secret import token, lfmkey, steamkey
 
 
 # CONFIGURATION
@@ -50,6 +50,7 @@ My commands are:
 .roll <x>d<y> - roll x number of y sided dice
 .qr <msg> - generate a QR code
 .np [<user>] - fetch now playing from last.fm for you or a specific username
+.steam [<user>] - fetch steam status for you or a specific vanityname
 ```"""
 
 # IDs of admin users
@@ -127,6 +128,48 @@ def lastfm_np(username):
 
     # construct string
     return username + nowplaying + " to `" + song + "` by `" + artist + albumtext
+
+# gets general steam user info from a vanityurl name
+def steamdata(vanityname):
+    # sanitise username
+    cleanvanityname = re.sub(r'[^a-zA-Z0-9_-]', '', vanityname, 0)
+
+    resolveurl = 'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key='
+    dataurl =  'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key='
+
+    # fetch json from steam
+    try:
+        idresponse = requests.get(resolveurl + steamkey + '&vanityurl=' + vanityname).json()['response']
+    except:
+        return 'I can\'t connect to Steam'
+
+    # check if user was found and extract steamid
+    if idresponse['success'] is not 1:
+        return ' I couldn\'t find ' + vanityname
+    else:
+        steamid = idresponse['steamid']
+
+    # fetch steam user info
+    try:
+        dataresponse = requests.get(dataurl + steamkey + '&steamids=' + steamid).json()['response']['players'][0]
+    except:
+        return 'Can\'t find info on ' + vanityname
+
+    personastates = ['Offline', 'Online', 'Busy', 'Away', 'Snoozed', 'Looking to trade', 'Looking to play']
+
+    if 'personaname' in dataresponse:
+        namestr = dataresponse['personaname']
+    else: namestr = ''
+    if 'personastate' in dataresponse:
+        statestr = '`' + personastates[dataresponse['personastate']] + '`'
+    else: statestr = ''
+    if 'gameextrainfo' in dataresponse:
+        gamestr = ' playing `' + dataresponse['gameextrainfo'] + '`'
+    else: gamestr = ''
+
+    responsetext = [(namestr + ' is ' + statestr + gamestr).replace('  ', ' ')]
+
+    return '\n'.join(responsetext)
 
 
 # EVENT HANDLERS
@@ -303,6 +346,15 @@ def on_message(message):
                 response = lastfm_np(message.author.name)
             else:
                 response = lastfm_np(tmp)
+
+        elif message.content.startswith('.steam'):
+            # show steam status
+            tmp = message.content[7:]
+
+            if tmp == '':
+                response = steamdata(message.author.name)
+            else:
+                response = steamdata(tmp)
 
         elif message.content.startswith('.qr '):
             # generate QR code - DANGEROUS, CHECK CAREFULLY HERE
