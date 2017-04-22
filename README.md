@@ -9,7 +9,7 @@ To run Maki, simply run bot.py.
 
 ## Required Files
 - You will require a Discord Application for Maki to use, the token for which should be stored in a file called secret.py:
-```json
+```python
 token = '<Discord Application Token>'
 lfmkey = '<last.fm API key>'
 steamkey = '<Steam API key>'
