@@ -80,18 +80,8 @@ def on_message(msg):
 					fp.write('\n' + msg.content)
 			except PermissionError: pass
 
-		# TODO: dedicated reaction function
-		# someone noticed me! <3
-		if bool(re.search(r'\bmaki\b', msg.content, re.IGNORECASE)):
-			yield from client.add_reaction(msg, '\N{BLACK HEART SUIT}')
-
-		# butter
-		if bool(re.search(r'\bbutter\b', msg.content, re.IGNORECASE)):
-			yield from client.add_reaction(msg, '\N{PERSON WITH FOLDED HANDS}')
-
-		# egg
-		if bool(re.search(r'\begg\b', msg.content, re.IGNORECASE)):
-			yield from client.add_reaction(msg, '\N{AUBERGINE}')
+		# react to stuff
+		yield from makireacts(client, msg)
 
 		# check for commands
 		if msg.content.startswith(prefix):

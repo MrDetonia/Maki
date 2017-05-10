@@ -11,6 +11,7 @@ import asyncio
 import discord
 import logging
 import datetime
+import re
 
 # LOCAL IMPORTS
 from common import *
@@ -66,3 +67,19 @@ def discord_typing(client, message):
 			break
 	else:
  		print('ERROR: Failed to send typing signal to discord after 5 attempts')
+
+
+# Maki Reacts to...
+@asyncio.coroutine
+def makireacts(client, msg):
+	# TODO: track down the person(s) responsible for naming emoji
+	reactions = {
+		r"\bmaki\b": "\N{BLACK HEART SUIT}",
+		r"\bbutter\b": "\N{PERSON WITH FOLDED HANDS}",
+		r"\begg\b": "\N{AUBERGINE}",
+		r"\bproblematic\b": "\N{EYEGLASSES}",
+	}
+
+	for i in reactions:
+		if bool(re.search(i, msg.content, re.IGNORECASE)):
+			yield from client.add_reaction(msg, reactions[i])
