@@ -13,7 +13,7 @@ import json
 
 
 # bot version
-version = "v1.0.0"
+version = "v1.0.1"
 
 
 # TODO: generate this on the fly and make it look acceptable
@@ -42,8 +42,8 @@ admins = ['116883900688629761']
 # log of users' last messages and timestamps
 history = {}
 if os.path.isfile('hist.json'):
-    with open('hist.json', 'r') as fp:
-        history = json.load(fp)
+	with open('hist.json', 'r') as fp:
+		history = json.load(fp)
 
 # quiet modes
 quiet = {}

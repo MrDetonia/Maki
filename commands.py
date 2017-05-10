@@ -104,7 +104,7 @@ def cmd_sayy(client, msg):
 
 @asyncio.coroutine
 def cmd_markov(client, msg):
-	discord_typing(client, msg)
+	yield from discord_typing(client, msg)
 
 	tmp = msg.content[8:]
 	target = ""
@@ -161,7 +161,7 @@ def cmd_roll(client, msg):
 def cmd_qr(client, msg):
 	tmp = msg.content[4:]
 
-	discord_typing(client, msg)
+	yield from discord_typing(client, msg)
 
 	# generate qr code
 	qr = subprocess.Popen("qrencode -t png -o -".split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)

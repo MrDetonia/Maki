@@ -43,14 +43,14 @@ client = discord.Client()
 @client.event
 @asyncio.coroutine
 def on_ready():
-    # info on terminal
-    print('Connected')
-    print('User: ' + client.user.name)
-    print('ID: ' + client.user.id)
+	# info on terminal
+	print('Connected')
+	print('User: ' + client.user.name)
+	print('ID: ' + client.user.id)
 
-    # set "Now Playing" to print version
-    game = discord.Game(name = version)
-    yield from client.change_presence(game=game)
+	# set "Now Playing" to print version
+	game = discord.Game(name = version)
+	yield from client.change_presence(game=game)
 
 
 # called when message received
