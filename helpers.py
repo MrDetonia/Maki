@@ -76,7 +76,7 @@ def makireacts(client, msg):
 	reactions = {
 		r"\bmaki\b": "\N{BLACK HEART SUIT}",
 		r"\bbutter\b": "\N{PERSON WITH FOLDED HANDS}",
-		r"\begg\b": "\N{AUBERGINE}",
+		r"\begg[s]?\b": "\N{AUBERGINE}",
 		r"\bproblematic\b": "\N{EYEGLASSES}",
 	}
 
