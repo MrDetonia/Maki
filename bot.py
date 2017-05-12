@@ -60,7 +60,7 @@ def on_message(msg):
 	# print messages to terminal for info
 	timestr = time.strftime('%Y-%m-%d-%H:%M:%S: ')
 	try:
-		print("{} | {} - {} | {}: {}".format(timestr, msg.server.name, msg.channel.name, msg.author.name, msg.content))
+		print("{} {} - {} | {}: {}".format(timestr, msg.server.name, msg.channel.name, msg.author.name, msg.content))
 	except AttributeError:
 		print("{} | PRIVATE | {}: {}".format(timestr, msg.author.name, msg.content))
 
@@ -94,6 +94,7 @@ def on_message(msg):
 
 # MAIN FUNCTION
 def main():
+	logger()
 	client.run(token)
 	exit(0)
 

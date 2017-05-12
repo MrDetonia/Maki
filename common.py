@@ -13,7 +13,7 @@ import json
 
 
 # bot version
-version = "v1.0.3"
+version = "v1.0.4"
 
 
 # TODO: generate this on the fly and make it look acceptable

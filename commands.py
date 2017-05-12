@@ -88,10 +88,8 @@ def cmd_seen(client, msg):
 
 @asyncio.coroutine
 def cmd_say(client, msg):
-	print("IN CMD_SAY")
 	response = msg.content[5:]
 	yield from client.delete_message(msg)
-	print("CALLING SEND")
 	yield from discord_send(client, msg, response)
 
 
