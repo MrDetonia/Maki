@@ -41,7 +41,7 @@ def cmd_info(client, msg):
 
 @asyncio.coroutine
 def cmd_upskirt(client, msg):
-	response = "No, don\'t look at my pantsu, baka! <https://gitla.in/MrDetonia/maki>"
+	response = "No, don\'t look at my pantsu, baka! <https://github.com/MrDetonia/maki>"
 	yield from discord_send(client, msg, response)
 
 

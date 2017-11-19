@@ -62,7 +62,7 @@ def on_message(msg):
 	try:
 		print("{} {} - {} | {}: {}".format(timestr, msg.server.name, msg.channel.name, msg.author.name, msg.content))
 	except AttributeError:
-		print("{} | PRIVATE | {}: {}".format(timestr, msg.author.name, msg.content))
+		print("{} PRIVATE | {}: {}".format(timestr, msg.author.name, msg.content))
 
 	# do not parse own messages or private messages
 	if msg.author != client.user and type(msg.channel) is not discord.PrivateChannel:
