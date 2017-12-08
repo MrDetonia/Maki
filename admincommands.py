@@ -12,6 +12,7 @@ import os
 import asyncio
 import subprocess
 import discord
+import urllib.request
 
 
 # LOCAL IMPORTS
@@ -44,10 +45,22 @@ def cmd_loud(client, msg):
 		quiet.pop(msg.server.id, None)
 
 
+@asyncio.coroutine
+def cmd_avatar(client, msg):
+        # TODO: error-check
+        # unsafe, but admin command - use with care for now
+        url = msg.content[8:]
+        try:
+            response = urllib.request.urlopen(url)
+            imgdata = response.read()
+            yield from client.edit_profile(avatar=imgdata)
+        except:
+            yield from discord_send(client, msg, "Error updating avatar!")
 
 # COMMAND HANDLING
 admincommands = {
 	"die": cmd_die,
 	"quiet": cmd_quiet,
 	"loud": cmd_loud,
+        "avatar": cmd_avatar,
 }
