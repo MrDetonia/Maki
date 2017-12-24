@@ -47,15 +47,22 @@ def cmd_loud(client, msg):
 
 @asyncio.coroutine
 def cmd_avatar(client, msg):
-        # TODO: error-check
-        # unsafe, but admin command - use with care for now
         url = msg.content[8:]
+        response = "Avatar updated!"
         try:
             response = urllib.request.urlopen(url)
             imgdata = response.read()
             yield from client.edit_profile(avatar=imgdata)
+        except urllib.error.URLError as e:
+            response = "URL Error: " + e
+        except discord.HTTPException:
+            response = "Dicsord failed to edit my profile!"
+        except discord.InvalidArgument:
+            response = "Invalid image!"
         except:
-            yield from discord_send(client, msg, "Error updating avatar!")
+            response = "Error updating avatar!"
+
+        yield from discord_send(client, msg, response)
 
 # COMMAND HANDLING
 admincommands = {
