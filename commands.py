@@ -148,7 +148,7 @@ def cmd_roll(client, msg):
 		for i in range(nums[0]):
 			rollsum += random.randint(1, nums[1])
 
-		response = "Using `{}d{}` you rolled: `{}`".format(nums[0], nums[1], rollsum)
+		response = "Using `{}d{}`, {} rolled: `{}`".format(nums[0], nums[1], msg.author.display_name, rollsum)
 	else:
 		response = "Expected format: `<num>d<value>`"
 
