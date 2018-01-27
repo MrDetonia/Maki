@@ -50,11 +50,11 @@ def cmd_avatar(client, msg):
         url = msg.content[8:]
         response = "Avatar updated!"
         try:
-            response = urllib.request.urlopen(url)
-            imgdata = response.read()
+            httpresponse = urllib.request.urlopen(url)
+            imgdata = httpresponse.read()
             yield from client.edit_profile(avatar=imgdata)
         except urllib.error.URLError as e:
-            response = "URL Error: " + e
+            response = "URL Error: " + str(e)
         except discord.HTTPException:
             response = "Dicsord failed to edit my profile!"
         except discord.InvalidArgument:
