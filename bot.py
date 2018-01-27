@@ -3,7 +3,7 @@
 # ----
 # Discord bot by MrDetonia
 #
-# Copyright 2017 Zac Herd
+# Copyright 2018 Zac Herd
 # Licensed under BSD 3-clause License, see LICENSE.md for more info
 
 

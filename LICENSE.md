@@ -1,7 +1,7 @@
 Modified BSD License
 ====================
 
-_Copyright © 2017, Zac Herd_  
+_Copyright © 2018, Zac Herd_  
 _All rights reserved._
 
 Redistribution and use in source and binary forms, with or without

@@ -17,7 +17,7 @@ steamkey = '<Steam API key>'
 - Maki uses JSON files to store data persistently. These will be created automatically in a data directory.
 
 ## License
-Copyright 2017, Zac Herd.  
+Copyright 2018, Zac Herd.  
 All Rights Reserved.  
 Licensed under the BSD 3-clause License.  
 See LICENSE.md for a full copy of the license text.  
