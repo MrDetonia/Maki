@@ -134,6 +134,7 @@ def cmd_roll(client, msg):
 	tmp = msg.content[6:]
 
 	pattern = re.compile("^([0-9]+)d([0-9]+)$")
+	pattern2 = re.compile("^d([0-9]+)$")
 
 	if pattern.match(tmp):
 		# extract numbers
@@ -149,8 +150,19 @@ def cmd_roll(client, msg):
 			rollsum += random.randint(1, nums[1])
 
 		response = "Using `{}d{}`, {} rolled: `{}`".format(nums[0], nums[1], msg.author.display_name, rollsum)
+	elif pattern2.match(tmp):
+		# extract number
+		num = [int(s) for s in re.findall(r"\d+", tmp)]
+
+		# limit range
+		num[0] = clamp(num[0], 1, 1000000)
+
+		# roll dice
+		roll = random.randint(1, num[0])
+
+		response = "Using `1d{}`, {} rolled `{}`".format(num[0], msg.author.display_name, roll)
 	else:
-		response = "Expected format: `<num>d<value>`"
+		response = "Expected format: `[<num>]d<value>`"
 
 	yield from discord_send(client, msg, response)
 
