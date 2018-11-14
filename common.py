@@ -10,7 +10,7 @@ import os
 import json
 
 # bot version
-version = "v1.1.0"
+version = "v1.2.0"
 
 # TODO: generate this on the fly and make it look acceptable
 # text shown by .help command

@@ -137,8 +137,8 @@ def cmd_markov(client, msg):
 def cmd_roll(client, msg):
     tmp = msg.content[6:]
 
-    pattern = re.compile("^([0-9]+)d([0-9]+)$")
-    pattern2 = re.compile("^d([0-9]+)$")
+    pattern = re.compile("^(\d+)d(\d+)([+-]\d+)?$")
+    pattern2 = re.compile("^d(\d+)([+-]\d+)?$")
 
     # extract numbers
     nums = [int(s) for s in re.findall(r"\d+", tmp)]
@@ -150,8 +150,19 @@ def cmd_roll(client, msg):
         numdice = 1
         diceval = nums[0]
     else:
-        response = "Expected format: `[<num>]d<value>`"
+        response = "Expected format: `[<num>]d<value>[{+-}<modifier>]`"
         yield from discord_send(client, msg, response)
+
+    # extract modifier, if any
+    modifier = 0
+    modpattern = re.compile("^(\d+)?d(\d+)[+-]\d+$")
+    if modpattern.match(tmp):
+        modifier = nums[len(nums) - 1]
+
+    # negate modifier, if necessary
+    modpattern = re.compile("^(\d+)?d(\d+)[-]\d+$")
+    if modpattern.match(tmp):
+        modifier = -modifier
 
     # limit ranges
     numdice = clamp(numdice, 1, 10)
@@ -162,20 +173,25 @@ def cmd_roll(client, msg):
     for i in range(numdice):
         rolls.append(random.randint(1, diceval))
 
-    rollsum = sum(rolls)
+    rollsum = sum(rolls) + modifier
 
+    # generate response text
     response = "**{} rolled:** {}d{}".format(msg.author.display_name, numdice,
                                              diceval)
+    if modifier > 0:
+        response += "+{}".format(modifier)
+    if modifier < 0:
+        response += "{}".format(modifier)
 
-    if numdice > 1:
-        response += "\n**Rolls:** `{}`".format(rolls)
-
+    response += "\n**Rolls:** `{}`".format(rolls)
     response += "\n**Result:** `{}`".format(rollsum)
 
-    if rollsum == numdice * diceval:
-        response += " *(Natural)*"
-    elif rollsum == numdice:
-        response += " *(Crit fail)*"
+    if rollsum - modifier == numdice * diceval:
+        response += " *(Natural - confirmed `{}`)*".format(
+            random.randint(1, 20))
+    elif rollsum - modifier == numdice:
+        response += " *(Crit fail - confirmed `{}`)*".format(
+            random.randint(1, 20))
 
     yield from discord_send(client, msg, response)
 
