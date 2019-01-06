@@ -165,7 +165,7 @@ def cmd_roll(client, msg):
         modifier = -modifier
 
     # limit ranges
-    numdice = clamp(numdice, 1, 10)
+    numdice = clamp(numdice, 1, 100)
     diceval = clamp(diceval, 1, 1000)
 
     # roll and sum dice
