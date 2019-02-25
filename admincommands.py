@@ -24,11 +24,6 @@ def cmd_die(client, msg):
     yield from client.send_message(msg.channel, "But will I dream? ;-;")
     yield from client.logout()
 
-    if msg.content[5:] == "reload":
-        # touch file to signal reload
-        with open("reload", "a"):
-            os.utime("reload", None)
-
 
 @asyncio.coroutine
 def cmd_quiet(client, msg):

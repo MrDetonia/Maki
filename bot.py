@@ -70,14 +70,14 @@ def on_message(msg):
         if msg.content != "":
             history[msg.server.id + msg.author.id] = (msg.server.id,
                                                       time.time(), msg.content)
-            with open('hist.json', 'w') as fp:
+            with open('./persist/hist.json', 'w') as fp:
                 json.dump(history, fp)
 
         # log user messages for markov chains, ignoring messages with certain substrings
         filters = ['`', 'http://', 'https://']
         if not any(x in msg.content for x in filters):
             try:
-                with open('./markovs/' + msg.server.id + '-' + msg.author.id,
+                with open('./persist/markovs/' + msg.server.id + '-' + msg.author.id,
                           'a') as fp:
                     fp.write('\n' + msg.content)
             except PermissionError:

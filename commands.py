@@ -123,7 +123,7 @@ def cmd_markov(client, msg):
                 reponse = "I can't find `{}`".format(tmp)
 
     if target != "":
-        mfile = "./markovs/" + target
+        mfile = "./persist/markovs/" + target
         if os.path.isfile(mfile):
             mc = markov.Markov(open(mfile))
             response = mc.generate_text(random.randint(20, 40))
