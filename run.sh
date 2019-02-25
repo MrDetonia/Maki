@@ -1,2 +1,2 @@
 #!/bin/sh
-docker run -v maki:/maki/persist -t maki
+docker run -v maki:/maki/persist --restart on-failure -t maki
