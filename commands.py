@@ -137,8 +137,8 @@ def cmd_markov(client, msg):
 def cmd_roll(client, msg):
     tmp = msg.content[6:]
 
-    pattern = re.compile("^(\d+)d(\d+)([+-]\d+)?$")
-    pattern2 = re.compile("^d(\d+)([+-]\d+)?$")
+    pattern = re.compile("^(\d+)d(\d+)([+-]\d+)?(.*)?$")
+    pattern2 = re.compile("^d(\d+)([+-]\d+)?(.*)?$")
 
     # extract numbers
     nums = [int(s) for s in re.findall(r"\d+", tmp)]
@@ -155,12 +155,12 @@ def cmd_roll(client, msg):
 
     # extract modifier, if any
     modifier = 0
-    modpattern = re.compile("^(\d+)?d(\d+)[+-]\d+$")
+    modpattern = re.compile("^(\d+)?d(\d+)[+-]\d+(.*)?$")
     if modpattern.match(tmp):
         modifier = nums[len(nums) - 1]
 
     # negate modifier, if necessary
-    modpattern = re.compile("^(\d+)?d(\d+)[-]\d+$")
+    modpattern = re.compile("^(\d+)?d(\d+)\-\d+(.*)?$")
     if modpattern.match(tmp):
         modifier = -modifier
 
