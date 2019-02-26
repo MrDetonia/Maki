@@ -42,6 +42,14 @@ def logger():
     logger.addHandler(handler)
 
 
+# fuzzy search over dictionary
+def search(dict, term):
+    s = term.lower()
+
+    for item in dict.items():
+        if s in item[0].lower():
+            yield item
+
 # send_message wrapper (deals with Discord's shit API)
 @asyncio.coroutine
 def discord_send(client, message, response):

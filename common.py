@@ -10,7 +10,7 @@ import os
 import json
 
 # bot version
-version = "v1.2.3"
+version = "v1.3.0"
 
 # TODO: generate this on the fly and make it look acceptable
 # text shown by .help command
@@ -27,6 +27,7 @@ My commands are:
 **.sayy <msg>** | say something a e s t h e t i c a l l y
 **.markov [<user>]** | generate markov chain over chat history for you or another user
 **.roll <num>d<val>** | roll x number of y sided dice
+**.spell <term>** | search for a D&D spell
 **.qr <msg>** | generate a QR code
 **.np [<user>]** | fetch now playing from last.fm for you or a specific username
 **.steam [<user>]** | fetch steam status for you or a specific vanityname
@@ -43,3 +44,5 @@ if os.path.isfile('hist.json'):
 
 # quiet modes
 quiet = {}
+
+spellslist = {}

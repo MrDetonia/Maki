@@ -13,6 +13,8 @@ import re
 import requests
 import random
 import subprocess
+import itertools
+import ftfy
 
 # LOCAL IMPORTS
 from common import *
@@ -197,6 +199,52 @@ def cmd_roll(client, msg):
 
 
 @asyncio.coroutine
+def cmd_spell(client, msg):
+    searchterm = msg.content[7:]
+
+    # perform search on user input
+    results = []
+    for result in itertools.islice(search(spellslist, searchterm), 3):
+        results.append(result)
+
+    # default response is an error
+    response = "Couldn't find any matching spells!"
+
+    # otherwise, grab spell data and generate response text
+    if results:
+        result = requests.get(results[0][1]).json()
+
+        response = "**Spell:** " + result['name']
+        if result['concentration'] is "yes":
+            response += " *(C)*"
+        response += "    " + str(result['components'])
+        response += "\n\n**Level:** " + str(result['level'])
+        response += "\n\n**Description:**"
+        for s in result['desc']:
+            response += '\n' + s
+        if 'higher_level' in result:
+            response += "\n\n**Higher Level:**"
+            for s in result['higher_level']:
+                response += '\n' + s
+        response += "\n\n**Range:** " + result['range']
+        response += "\n\n**Casting Time:** " + result['casting_time']
+        response += "\n\n**Duration:** " + result['duration']
+
+        # repair encoding errors from API
+        response = ftfy.fix_text(response)
+
+        # append next search matches, if any
+        matches = []
+        for k,_ in results[1:]:
+            matches.append(k)
+
+        if matches:
+            response += "\n\n*Possible Matches: " + str(matches) + "*"
+
+    yield from discord_send(client, msg, response)
+
+
+@asyncio.coroutine
 def cmd_qr(client, msg):
     tmp = msg.content[4:]
 
@@ -358,6 +406,7 @@ commands = {
     "sayy": cmd_sayy,
     "markov": cmd_markov,
     "roll": cmd_roll,
+    "spell": cmd_spell,
     "qr": cmd_qr,
     "np": cmd_np,
     "steam": cmd_steam,

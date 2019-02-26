@@ -44,10 +44,13 @@ def on_ready():
     print('User: ' + client.user.name)
     print('ID: ' + client.user.id)
 
+    # populate D&D spells list
+    for spell in requests.get('http://dnd5eapi.co/api/spells/').json()['results']:
+        spellslist[spell['name']] = spell['url']
+
     # set "Now Playing" to print version
     game = discord.Game(name=version)
     yield from client.change_presence(game=game)
-
 
 # called when message received
 @client.event
